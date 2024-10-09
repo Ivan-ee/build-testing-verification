@@ -1,6 +1,6 @@
 from typing import Union
 
-from pr_2.error.error import *
+from error.error import ErrNotString, ErrNotEmpty, ErrNotNumber, ErrNotPositive, ErrNotIngredient, ErrNotList
 
 
 class Ingredient:
@@ -60,7 +60,7 @@ class Ingredient:
     def cost(self, value):
         if not isinstance(value, (int, float)):
             raise ErrNotNumber
-        if value < 0:
+        if value <= 0:
             raise ErrNotPositive
         self._cost = value
 
