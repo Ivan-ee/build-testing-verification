@@ -127,9 +127,37 @@ if __name__ == "__main__":
         ]
     }
 
-    receipt_parfait = Receipt(receipt_from_api_beet["title"], receipt_from_api_beet["ingredients_list"])
+    receipt_beet = Receipt(receipt_from_api_beet["title"], receipt_from_api_beet["ingredients_list"])
     print(
-        f"Общий вес сырого продукта для '{receipt_parfait.name}': {receipt_parfait.calc_weight()}\n"
-        f"Общий вес готового продукта для '{receipt_parfait.name}': {receipt_parfait.calc_weight(raw=False)}\n"
-        f"Стоимость блюда '{receipt_parfait.name}': {receipt_parfait.calc_cost()}\n"
+        f"Общий вес сырого продукта для '{receipt_beet.name}': {receipt_beet.calc_weight()}\n"
+        f"Общий вес готового продукта для '{receipt_beet.name}': {receipt_beet.calc_weight(raw=False)}\n"
+        f"Стоимость блюда '{receipt_beet.name}': {receipt_beet.calc_cost()}\n"
+    )
+
+    #     И(ван) - (И)тальянская пицца
+
+    receipt_from_api_italian_pizza = {
+        "title": "Итальянская пицца",
+        "ingredients_list": [
+            ("Мука", 500, 500, 100),
+            ("Вода", 300, 1, 10),
+            ("Дрожжи", 7, 7, 12),
+            ("Соль", 10, 10, 10),
+            ("Яйца", 100, 70, 120),
+            ("Укроп", 15, 15, 40),
+            ("Сметана", 60, 60, 80),
+            ("Томаты", 400, 100, 200),
+            ("Чеснок", 10, 10, 40),
+            ("Чеснок", 10, 10, 40),
+            ("Пепперони", 300, 150, 300),
+            ("Моцарелла", 250, 150, 200),
+        ]
+    }
+
+    receipt_italian_pizza = Receipt(receipt_from_api_italian_pizza["title"],
+                                    receipt_from_api_italian_pizza["ingredients_list"])
+    print(
+        f"Общий вес сырого продукта для '{receipt_italian_pizza.name}': {receipt_italian_pizza.calc_weight()}\n"
+        f"Общий вес готового продукта для '{receipt_italian_pizza.name}': {receipt_italian_pizza.calc_weight(raw=False)}\n"
+        f"Стоимость блюда '{receipt_italian_pizza.name}': {receipt_italian_pizza.calc_cost()}\n"
     )
