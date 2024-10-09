@@ -111,5 +111,25 @@ class Receipt:
         return total_weight * portions
 
 
-#
+if __name__ == "__main__":
+    # (С)мирнов -> (С)векольник
 
+    receipt_from_api_beet = {
+        "title": "Свекольник",
+        "ingredients_list": [
+            ("Свекла", 250, 180, 50),
+            ("Картофель", 200, 200, 30),
+            ("Морковь", 150, 150, 40),
+            ("Лук", 50, 50, 60),
+            ("Яйца", 100, 70, 120),
+            ("Укроп", 15, 15, 40),
+            ("Сметана", 60, 60, 80),
+        ]
+    }
+
+    receipt_parfait = Receipt(receipt_from_api_beet["title"], receipt_from_api_beet["ingredients_list"])
+    print(
+        f"Общий вес сырого продукта для '{receipt_parfait.name}': {receipt_parfait.calc_weight()}\n"
+        f"Общий вес готового продукта для '{receipt_parfait.name}': {receipt_parfait.calc_weight(raw=False)}\n"
+        f"Стоимость блюда '{receipt_parfait.name}': {receipt_parfait.calc_cost()}\n"
+    )
