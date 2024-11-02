@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Главная страница</h1>
-<div>Рецепты списком тут будут.</div>
+<h1 class="mb-4 text-dark-pink">Главная страница</h1>
+
+{% if recipes %}
+<p class="text-muted">Количество рецептов: {{ recipes|length }}</p>
+<div class="row">
+    {% for recipe in recipes %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-sm rounded-4 bg-light-pink">
+            <div class="card-body">
+                <h5 class="card-title text-dark-pink">{{ recipe.title }}</h5>
+                <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
+                <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-outline-dark-pink rounded-4">Подробнее</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-warning text-center rounded-4">
+    <p class="mb-0">Рецептов пока нет.</p>
+</div>
+{% endif %}
 {% endblock %}

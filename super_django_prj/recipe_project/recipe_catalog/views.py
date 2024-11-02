@@ -3,7 +3,9 @@ from django.shortcuts import render
 
 
 def about(request):
-    return HttpResponse("О проекте")
+    template_name = 'recipe_catalog/about.html'
+
+    return render(request, template_name)
 
 
 def index(request):

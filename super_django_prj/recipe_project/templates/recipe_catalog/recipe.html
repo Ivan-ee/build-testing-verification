@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Рецепт</h1>
-<h2>{{title}}</h2>
-<div>Описание рецепта с id = {{recipe_id}}</div>
+<h1 class="mb-4">Рецепт</h1>
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">{{ title }}</h2>
+        <p class="card-text">Описание рецепта с id = {{ recipe_id }}</p>
+    </div>
+</div>
 {% endblock %}
