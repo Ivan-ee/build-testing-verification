@@ -7,8 +7,15 @@ def about(request):
 
 
 def index(request):
-    return HttpResponse('Главная страница')
+    template_name = 'recipe_catalog/index.html'
+
+    return render(request, template_name)
 
 
 def recipe_detail(request, pk):
-    return HttpResponse(f'Описание проекта id = {pk}')
+    template_name = 'recipe_catalog/recipe.html'
+
+    title = 'Блинчики с мясом'
+    context = {'title': title, 'recipe_id': pk}
+
+    return render(request, template_name, context)
