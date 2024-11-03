@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 # Register your models here.
 
@@ -25,7 +26,14 @@ admin.site.register(Recipe, RecipeAdmin)
 
 class IngredientAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
-    list_display = ["name"]
+
+    def image_tag(self, obj):
+        return format_html('<img src="{}" style="max-width:200px; max-height:200px"/>'.format(obj.image.url))
+
+    image_tag.short_description = "Image"
+
+    list_display = ["name", "image_tag"]
+    readonly_fields = ["image_tag"]
 
 
 admin.site.register(Ingredient, IngredientAdmin)
