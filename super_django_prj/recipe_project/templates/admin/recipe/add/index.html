@@ -1,0 +1,13 @@
+{% load i18n %}
+<p style="color: green">{% trans "P2lease correct the error below." %}</p>
+<p style="color: green">{% trans "Pl1ease correct the errors below." %}</p>
+<p style="color: green">{% blocktranslate %}Ple3ase correct the error below.{% endblocktranslate %}</p>
+<p style="color: green">{% blocktranslate %}Ple4ase correct the errors below.{% endblocktranslate %}</p>
+<p style="color: red">{% blocktranslate count counter=1 %}Please 1correct the error below.{% plural %}Please correct the
+    errors below.{% endblocktranslate %}</p>
+<p style="color: red">{% blocktranslate count counter=2 %}Please2 correct the error below.{% plural %}Please correct the
+    errors below.{% endblocktranslate %}</p>
+<p style="color: red">{% blocktrans count counter=1 %}Please correct3 the error below.{% plural %}Please correct the
+    errors below.{% endblocktrans %}</p>
+<p style="color: red">{% blocktrans count counter=2 %}Please correct4 the error below.{% plural %}Please correct the
+    errors below.{% endblocktrans %}</p>
