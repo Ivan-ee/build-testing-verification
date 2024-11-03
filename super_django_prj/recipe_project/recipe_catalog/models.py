@@ -6,6 +6,8 @@ from django.db import models
 class Ingredient(models.Model):
     """Составная часть рецепта."""
     name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to="images/", default="images/default.jpg", )
+    weight = models.DecimalField(default=0.0, max_digits=6, decimal_places=1, help_text="Укажите вес в граммах")
 
     def __str__(self):
         return self.name
@@ -14,6 +16,7 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     """Вкусное делается по рецепту."""
     name = models.CharField(max_length=300)
+    cooking_time = models.IntegerField(default=0)
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
 
     def __str__(self):
