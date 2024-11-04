@@ -21,6 +21,15 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(default=0)
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
 
+    def total_weight(self):
+        return sum(ri.weight for ri in self.recipeingredient_set.all())
+
+    def total_calories(self):
+        total_calories = sum(
+            (ri.weight / 100) * ri.ingredient.calories for ri in self.recipeingredient_set.all()
+        )
+        return round(total_calories, 2)
+
     def __str__(self):
         return self.name
 
