@@ -5,7 +5,18 @@
 <div class="card">
     <div class="card-body">
         <h2 class="card-title">{{ title }}</h2>
-        <p class="card-text">Описание рецепта с id = {{ recipe_id }}</p>
+        <p class="card-text">{{ description }}</p>
+        <p>Время приготовления: {{ cooking_time }} минут</p>
+        <p>Общий вес: {{ total_weight }} грамм</p>
+        <p>Общая калорийность: {{ total_calories }} ккал</p>
+
+        <h3>Ингредиенты:</h3>
+        <ul>
+            {% for ingredient in ingredients %}
+            <li>{{ ingredient.ingredient.name }} - {{ ingredient.weight }} грамм
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock %}

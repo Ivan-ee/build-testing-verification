@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from .models import Recipe
 
@@ -12,24 +12,26 @@ def about(request):
 
 def index(request):
     template_name = 'recipe_catalog/index.html'
+    recipes = Recipe.objects.all()
 
-    return render(request, template_name)
-
-
-def recipe_detail(request, pk):
-    template_name = 'recipe_catalog/recipe.html'
-
-    # title = 'Блинчики с мясом'
-    # context = {'title': title, 'recipe_id': pk}
-    #
-    # return render(request, template_name, context)
-
-    recipe = Recipe.objects.get(pk=pk)
     context = {
-        'title': recipe.name,
-        'recipe_id': pk,
-        'ingredients': recipe.ingredients.order_by('name')
+        'recipes': recipes
     }
 
     return render(request, template_name, context)
 
+
+def recipe_detail(request, pk):
+    template_name = 'recipe_catalog/recipe.html'
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    context = {
+        'title': recipe.name,
+        'description': recipe.description,
+        'cooking_time': recipe.cooking_time,
+        'total_weight': recipe.total_weight(),
+        'total_calories': recipe.total_calories(),
+        'ingredients': recipe.recipeingredient_set.select_related('ingredient').order_by('ingredient__name')
+    }
+
+    return render(request, template_name, context)

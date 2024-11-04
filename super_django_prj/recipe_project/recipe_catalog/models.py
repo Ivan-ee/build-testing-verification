@@ -2,8 +2,6 @@ from django.db import models
 from django.utils.html import mark_safe
 
 
-# Create your models here.
-
 class Ingredient(models.Model):
     """Составная часть рецепта."""
     name = models.CharField(max_length=255)

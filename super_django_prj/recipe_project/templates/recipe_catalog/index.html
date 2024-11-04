@@ -10,7 +10,7 @@
     <div class="col-md-6 col-lg-4 mb-4">
         <div class="card shadow-sm rounded-4 bg-light-pink">
             <div class="card-body">
-                <h5 class="card-title text-dark-pink">{{ recipe.title }}</h5>
+                <h5 class="card-title text-dark-pink">{{ recipe.name }}</h5>
                 <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
                 <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-outline-dark-pink rounded-4">Подробнее</a>
             </div>
