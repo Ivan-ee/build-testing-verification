@@ -5,20 +5,18 @@ from django.utils.html import format_html
 
 from .models import Ingredient, Recipe, RecipeIngredient
 
-# admin.site.register(Ingredient)
-# admin.site.register(Recipe)
-
 
 class IngredientInline(admin.StackedInline):
     """В рецепте есть ингредиенты."""
     model = RecipeIngredient
-    extra = 5
+    extra = 1
+    fields = ['ingredient', 'weight']
 
 
 class RecipeAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
     inlines = [IngredientInline]
-    list_display = ["name"]
+    list_display = ["name", "cooking_time"]
 
 
 admin.site.register(Recipe, RecipeAdmin)
@@ -32,7 +30,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
     image_tag.short_description = "Image"
 
-    list_display = ["name", "image_tag"]
+    list_display = ["name", "calories", "image_tag"]
     readonly_fields = ["image_tag"]
 
 
