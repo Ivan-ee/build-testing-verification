@@ -18,6 +18,7 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     """Вкусное делается по рецепту."""
     name = models.CharField(max_length=300)
+    description = models.TextField(default="", help_text="Описание")
     cooking_time = models.IntegerField(default=0)
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
 
