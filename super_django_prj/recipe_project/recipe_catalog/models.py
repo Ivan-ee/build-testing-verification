@@ -1,13 +1,35 @@
 from django.db import models
 from django.utils.html import mark_safe
 
+from django.db import models
+
 
 class Ingredient(models.Model):
     """Составная часть рецепта."""
-    name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to="images/", default="images/default.jpg", )
-    calories = models.DecimalField(default=0.0, max_digits=6, decimal_places=2,
-                                   help_text="Калорийность в ккал на 100 грамм")
+
+    MEASUREMENT_SCALE = [
+        ('g', 'Граммы'),
+        ('pcs', 'Штуки'),
+        ('tbsp', 'Столовые ложки'),
+        ('tsp', 'Чайные ложки'),
+        ('ml', 'Миллилитры'),
+    ]
+
+    name = models.CharField(max_length=255, verbose_name="Название")
+    image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
+    calories = models.DecimalField(
+        default=0.0,
+        max_digits=6,
+        decimal_places=2,
+        help_text="Калорийность на 100 ед/изм",
+        verbose_name="Калорийность",
+    )
+    unit = models.CharField(
+        max_length=10,
+        choices=MEASUREMENT_SCALE,
+        default='g',
+        verbose_name="Единица измерения",
+    )
 
     def __str__(self):
         return self.name
