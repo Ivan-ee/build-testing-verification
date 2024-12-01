@@ -96,7 +96,7 @@ class RecipeIngredient(models.Model):
     несколько ингредиентов."""
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    weight = models.DecimalField(default=0.0, max_digits=6, decimal_places=1, help_text="Вес в граммах")
+    weight = models.IntegerField(default=0, help_text="Вес в граммах")
 
     def __str__(self):
         return f'{self.recipe.name} - {self.ingredient.name} ({self.weight} г)'
