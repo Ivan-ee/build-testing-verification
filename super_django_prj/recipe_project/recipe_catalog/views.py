@@ -26,13 +26,18 @@ def recipe_detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
 
     ingredients = []
-    for ri in recipe.recipeingredient_set.select_related('ingredient').order_by('ingredient__name'):
+    for ri in recipe.recipeingredient_set.select_related('ingredient__unit').order_by('ingredient__name'):
         ingredient = ri.ingredient
-        if ingredient.unit and ingredient.unit.key == 'pcs':
-            weight = ri.count * ingredient.weight_by_pcs
-            unit = f"{ri.count} шт"
+        unit = ''
+
+        if ingredient.unit:
+            if ingredient.unit.abbreviation:
+                unit = f"{ri.count} {ingredient.unit.abbreviation}"
+            else:
+                unit = f"{ri.count} {ingredient.unit.label}"
         else:
-            unit = f"{ri.count} {ingredient.unit.label}" if ingredient.unit else f"{ri.count} г"
+            unit = f"{ri.count} г"  # Если нет единицы измерения, используем граммы
+
         ingredients.append({
             'name': ingredient.name,
             'unit': unit
