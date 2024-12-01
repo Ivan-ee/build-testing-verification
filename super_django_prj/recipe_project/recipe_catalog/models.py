@@ -46,11 +46,11 @@ class Ingredient(models.Model):
         """Валидация данных модели."""
         if self.unit and self.unit.key == self.PCS and (self.weight_by_pcs is None or self.weight_by_pcs <= 0):
             raise ValidationError({
-                'weight_by_pcs': "Для единицы измерения 'штуки' необходимо указать вес в граммах."
+                'weight_by_pcs': "Для единицы измерения 'штуки' необходимо указать вес в граммах"
             })
         if self.unit and self.unit.key != self.PCS and self.weight_by_pcs:
             raise ValidationError({
-                'weight_by_pcs': "Поле 'Вес шт/гр' должно быть пустым для выбранной единицы измерения."
+                'weight_by_pcs': "Поле 'Вес шт/гр' должно быть пустым для выбранной единицы измерения"
             })
 
     def __str__(self):
