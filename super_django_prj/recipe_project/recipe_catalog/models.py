@@ -7,25 +7,28 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 
+class MeasurementScale(models.Model):
+    label = models.CharField(max_length=50, verbose_name="Единица измерения")
+    key = models.CharField(max_length=10, unique=True, verbose_name="Сокращение")
+
+    def __str__(self):
+        return self.label
+
+
 class Ingredient(models.Model):
-    MEASUREMENT_SCALE = [
-        ('g', 'Граммы'),
-        ('pcs', 'Штуки'),
-        ('tbsp', 'Столовые ложки'),
-        ('tsp', 'Чайные ложки'),
-        ('ml', 'Миллилитры'),
-    ]
+    PCS = 'pcs'
 
     name = models.CharField(max_length=255, verbose_name="Название")
-    image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
 
-    unit = models.CharField(
-        max_length=10,
-        choices=MEASUREMENT_SCALE,
-        default='g',
+    unit = models.ForeignKey(
+        MeasurementScale,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         verbose_name="Единица измерения",
     )
-    conversion_to_grams = models.IntegerField(
+
+    weight_by_pcs = models.IntegerField(
         default=0,
         null=True,
         blank=True,
@@ -43,13 +46,13 @@ class Ingredient(models.Model):
 
     def clean(self):
         """Валидация данных модели."""
-        if self.unit == 'pcs' and (self.conversion_to_grams is None or self.conversion_to_grams <= 0):
+        if self.unit and self.unit.key == self.PCS and (self.weight_by_pcs is None or self.weight_by_pcs <= 0):
             raise ValidationError({
-                'conversion_to_grams': "Для единицы измерения 'штуки' необходимо указать вес в граммах."
+                'weight_by_pcs': "Для единицы измерения 'штуки' необходимо указать вес в граммах."
             })
-        if self.unit != 'pcs' and self.conversion_to_grams:
+        if self.unit and self.unit.key != self.PCS and self.weight_by_pcs:
             raise ValidationError({
-                'conversion_to_grams': "Поле 'Вес шт/гр' должно быть пустым для выбранной единицы измерения."
+                'weight_by_pcs': "Поле 'Вес шт/гр' должно быть пустым для выбранной единицы измерения."
             })
 
     def __str__(self):

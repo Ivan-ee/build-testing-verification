@@ -35,13 +35,7 @@ admin.site.register(Recipe, RecipeAdmin)
 class IngredientAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
 
-    def image_tag(self, obj):
-        return format_html('<img src="{}" style="max-width:200px; max-height:200px"/>'.format(obj.image.url))
-
-    image_tag.short_description = "Image"
-
-    list_display = ["name", "calories", "image_tag"]
-    readonly_fields = ["image_tag"]
+    list_display = ["name", "calories", ]
 
 
 admin.site.register(Ingredient, IngredientAdmin)
