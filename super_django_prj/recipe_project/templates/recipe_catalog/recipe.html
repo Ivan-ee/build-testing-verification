@@ -13,8 +13,7 @@
         <h3>Ингредиенты:</h3>
         <ul>
             {% for ingredient in ingredients %}
-            <li>{{ ingredient.ingredient.name }} - {{ ingredient.weight }} грамм
-            </li>
+            <li>{{ ingredient.name }} - {{ ingredient.unit }}</li>
             {% endfor %}
         </ul>
     </div>
