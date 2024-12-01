@@ -91,12 +91,26 @@ class Recipe(models.Model):
             total_weight += weight_in_grams
         return total_weight
 
-    # def total_calories(self):
-    #     total_calories = sum(
-    #         (ri.weight * ri.ingredient.conversion_to_grams / 100) * ri.ingredient.calories
-    #         for ri in self.recipeingredient_set.all()
-    #     )
-    #     return round(total_calories, 2)
+    def total_calories(self):
+        """Общая калорийность рецепта."""
+        total_calories = 0
+        for ri in self.recipeingredient_set.all():
+            ingredient = ri.ingredient
+            if ingredient.unit and ingredient.unit.key == ingredient.PCS:
+                weight_in_grams = ri.count * ingredient.weight_by_pcs
+            elif ingredient.unit:
+                volume_conversion = VolumeUnitConversion.objects.filter(unit=ingredient.unit).first()
+                if volume_conversion:
+                    weight_in_grams = ri.count * volume_conversion.weight
+                else:
+                    weight_in_grams = ri.count
+            else:
+                weight_in_grams = ri.count
+
+            calories = (weight_in_grams / 100) * ingredient.calories
+            total_calories += calories
+
+        return round(total_calories, 2)
 
     def __str__(self):
         return self.name
