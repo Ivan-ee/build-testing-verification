@@ -20,6 +20,14 @@ class IngredientInline(admin.StackedInline):
             return f"{unit_label}"
         return "Количество в граммах"
 
+    def ingredient(self):
+        return "Ингредиент"
+
+    def count(self):
+        return "Ингредиент"
+
+    ingredient.short_description = "Ингредиент"
+    count.short_description = "Количество"
     count_text.short_description = "Единица измерения"
 
 
