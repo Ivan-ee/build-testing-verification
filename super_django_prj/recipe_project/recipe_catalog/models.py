@@ -36,10 +36,8 @@ class Ingredient(models.Model):
         verbose_name="Вес шт/гр (опционально)",
     )
 
-    calories = models.DecimalField(
-        default=0.0,
-        max_digits=6,
-        decimal_places=2,
+    calories = models.IntegerField(
+        default=0,
         help_text="Калорийность на 100 ед. изм.",
         verbose_name="Калорийность",
     )

@@ -35,7 +35,7 @@ admin.site.register(Recipe, RecipeAdmin)
 class IngredientAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
 
-    list_display = ["name", "calories", ]
+    list_display = ["name"]
 
 
 admin.site.register(Ingredient, IngredientAdmin)
