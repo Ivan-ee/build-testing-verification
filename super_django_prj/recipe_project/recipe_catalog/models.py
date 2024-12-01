@@ -110,16 +110,7 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
 
     def get_help_text(self):
-        """
-        Возвращает текст подсказки для поля count, в зависимости от единицы измерения ингредиента.
-        Извлекает label из MeasurementScale, связанного с ингредиентом.
-        """
-        if self.ingredient.unit:
-            unit_label = self.ingredient.unit.label
-            return f"Количество {self.ingredient.name} в {unit_label}"
         return "Количество в граммах"
-
-    help_text = get_help_text
 
     count = models.IntegerField(default=0)
 
