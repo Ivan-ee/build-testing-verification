@@ -73,33 +73,58 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
 
     def total_weight(self):
-        return sum(
-            ri.weight * ri.ingredient.conversion_to_grams
-            for ri in self.recipeingredient_set.all()
-        )
+        total_weight = 0
+        for ri in self.recipeingredient_set.all():
+            ingredient = ri.ingredient
+            if ingredient.unit.key == ingredient.PCS:
+                weight_in_grams = ri.count * ingredient.weight_by_pcs
+            else:
+                if ingredient.unit:
+                    volume_conversion = VolumeUnitConversion.objects.filter(unit=ingredient.unit).first()
+                    if volume_conversion:
+                        weight_in_grams = ri.count * volume_conversion.weight
+                    else:
+                        weight_in_grams = ri.count
+                else:
+                    weight_in_grams = ri.count
 
-    def total_calories(self):
-        total_calories = sum(
-            (ri.weight * ri.ingredient.conversion_to_grams / 100) * ri.ingredient.calories
-            for ri in self.recipeingredient_set.all()
-        )
-        return round(total_calories, 2)
+            total_weight += weight_in_grams
+        return total_weight
+
+    # def total_calories(self):
+    #     total_calories = sum(
+    #         (ri.weight * ri.ingredient.conversion_to_grams / 100) * ri.ingredient.calories
+    #         for ri in self.recipeingredient_set.all()
+    #     )
+    #     return round(total_calories, 2)
 
     def __str__(self):
         return self.name
 
 
 class RecipeIngredient(models.Model):
-    """Один ингредиент может быть
-    в нескольких рецептах,
-    как и в одном рецепте может быть
-    несколько ингредиентов."""
+    """Один ингредиент может быть в нескольких рецептах,
+    как и в одном рецепте может быть несколько ингредиентов."""
+
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    weight = models.IntegerField(default=0, help_text="Вес в граммах")
+
+    def get_help_text(self):
+        """
+        Возвращает текст подсказки для поля count, в зависимости от единицы измерения ингредиента.
+        Извлекает label из MeasurementScale, связанного с ингредиентом.
+        """
+        if self.ingredient.unit:
+            unit_label = self.ingredient.unit.label
+            return f"Количество {self.ingredient.name} в {unit_label}"
+        return "Количество в граммах"
+
+    help_text = get_help_text
+
+    count = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'{self.recipe.name} - {self.ingredient.name} ({self.weight} г)'
+        return f'{self.recipe.name} - {self.ingredient.name} ({self.count} г)'
 
     class Meta:
         constraints = [
