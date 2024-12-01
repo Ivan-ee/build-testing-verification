@@ -3,7 +3,6 @@ from django.utils.html import mark_safe
 
 from django.db import models
 
-
 from django.core.exceptions import ValidationError
 
 
@@ -13,6 +12,16 @@ class MeasurementScale(models.Model):
 
     def __str__(self):
         return self.label
+
+
+class VolumeUnitConversion(models.Model):
+    unit = models.ForeignKey(
+        MeasurementScale,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    weight = models.IntegerField()
 
 
 class Ingredient(models.Model):
