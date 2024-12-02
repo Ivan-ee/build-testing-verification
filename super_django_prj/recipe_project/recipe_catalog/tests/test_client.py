@@ -13,6 +13,7 @@ User = get_user_model()
 class TestCatalog(TestCase):
     RECIPE_NAME = 'Яичница'
     HOME_URL = reverse('recipe_catalog:home')
+
     @classmethod
     def setUpTestData(cls):
         all_recipes = []
