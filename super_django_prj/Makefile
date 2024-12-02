@@ -9,3 +9,9 @@ migrate:
 
 test:
 	cd recipe_project && python manage.py test
+
+test-report:
+	cd recipe_project && coverage run manage.py test
+
+report:
+	cd recipe_project && coverage report
