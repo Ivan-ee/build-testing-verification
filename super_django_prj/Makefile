@@ -6,3 +6,6 @@ makemigrations:
 
 migrate:
 	cd recipe_project && python manage.py migrate
+
+test:
+	cd recipe_project && python manage.py test
