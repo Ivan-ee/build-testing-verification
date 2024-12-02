@@ -15,3 +15,6 @@ test-report:
 
 report:
 	cd recipe_project && coverage report
+
+report-html:
+	cd recipe_project && coverage html

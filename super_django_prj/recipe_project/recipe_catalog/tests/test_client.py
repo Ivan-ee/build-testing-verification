@@ -24,7 +24,7 @@ class TestCatalog(TestCase):
             name=cls.RECIPE_NAME,
         )
 
-        for index in range(settings.OBJS_ON_PAGE + 1):
+        for index in range(settings.OBJS_ON_PAGE - 1):
             news = Recipe(
                 name=f'Рецепт {index}')
             all_recipes.append(news)
@@ -44,8 +44,8 @@ class TestCatalog(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    # def test_home_count_recipes(self):
-    #     response = self.client.get(self.HOME_URL)
-    #     object_list = response.context['recipes']
-    #     news_count = object_list.count()
-    #     self.assertEqual(news_count, settings.OBJS_ON_PAGE)
+    def test_home_count_recipes(self):
+        response = self.client.get(self.HOME_URL)
+        object_list = response.context['recipes']
+        news_count = object_list.count()
+        self.assertEqual(news_count, settings.OBJS_ON_PAGE)
