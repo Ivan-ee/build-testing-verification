@@ -11,6 +11,7 @@ User = get_user_model()
 
 class TestClientAnonymous(TestCase):
     HOME_URL = reverse('recipe_catalog:home')
+    ABOUT_URL = reverse('recipe_catalog:about')
     DETAIL_URL = 'recipe_catalog:detail'
 
     RECIPE_NAME = 'Яичница'
@@ -29,6 +30,11 @@ class TestClientAnonymous(TestCase):
     def test_home_page_anonymous_access(self):
         """Главная страница доступна анонимному пользователю."""
         response = self.client.get(self.HOME_URL)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_about_page_anonymous_access(self):
+        """Страница Описания доступна анонимному пользователю."""
+        response = self.client.get(self.ABOUT_URL)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_recipe_detail_anonymous_access(self):
