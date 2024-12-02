@@ -21,7 +21,7 @@ def index(request):
     return render(request, template_name, context)
 
 
-def recipe_detail(request, pk):
+def detail(request, pk):
     template_name = 'recipe_catalog/recipe.html'
     recipe = get_object_or_404(Recipe, pk=pk)
 
@@ -36,7 +36,7 @@ def recipe_detail(request, pk):
             else:
                 unit = f"{ri.count} {ingredient.unit.label}"
         else:
-            unit = f"{ri.count} г"  # Если нет единицы измерения, используем граммы
+            unit = f"{ri.count} г"
 
         ingredients.append({
             'name': ingredient.name,

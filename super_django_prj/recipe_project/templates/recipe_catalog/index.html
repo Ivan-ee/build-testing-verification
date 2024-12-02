@@ -12,7 +12,7 @@
             <div class="card-body">
                 <h5 class="card-title text-dark-pink">{{ recipe.name }}</h5>
                 <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
-                <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-outline-dark-pink rounded-4">Подробнее</a>
+                <a href="{% url 'recipe_catalog:detail' recipe.id %}" class="btn btn-outline-dark-pink rounded-4">Подробнее</a>
             </div>
         </div>
     </div>
