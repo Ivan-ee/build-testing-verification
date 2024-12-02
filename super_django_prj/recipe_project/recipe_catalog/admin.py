@@ -35,7 +35,13 @@ class RecipeAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
     inlines = [IngredientInline]
     list_display = ["name", "cooking_time", "total_weight_display", "total_calories_display"]
-    readonly_fields = ["total_weight_display", "total_calories_display"]
+    readonly_fields = ["total_weight_display", "total_calories_display", "image_tag"]
+
+    def recipe_name(self, obj):
+        return obj.name
+
+    def image_tag(self, obj):
+        return format_html('<img src="{}" style="max-width:200px; max-height:200px"/>'.format(obj.image.url))
 
     def total_weight_display(self, obj):
         return obj.total_weight()
@@ -43,6 +49,8 @@ class RecipeAdmin(admin.ModelAdmin):
     def total_calories_display(self, obj):
         return obj.total_calories()
 
+    recipe_name.short_description = "Название"
+    image_tag.short_description = "Фото"
     total_weight_display.short_description = "Итоговый вес (грамм)"
     total_calories_display.short_description = "Итоговая калорийность (ккал)"
 

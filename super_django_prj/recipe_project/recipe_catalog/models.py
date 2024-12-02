@@ -70,6 +70,7 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     name = models.CharField(max_length=300)
     description = models.TextField(default="", help_text="Описание")
+    image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
     cooking_time = models.IntegerField(default=0)
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
 
