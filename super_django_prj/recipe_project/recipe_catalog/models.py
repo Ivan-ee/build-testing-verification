@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.html import mark_safe
+from django.contrib.auth.models import User
 
 from django.db import models
 
@@ -73,6 +74,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
     cooking_time = models.IntegerField(default=0)
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", default=1)
 
     def total_weight(self):
         total_weight = 0

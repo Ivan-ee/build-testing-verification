@@ -1,7 +1,7 @@
 run:
 	cd recipe_project && python manage.py runserver
 
-makemigrations:
+migrations:
 	cd recipe_project && python manage.py makemigrations
 
 migrate:
