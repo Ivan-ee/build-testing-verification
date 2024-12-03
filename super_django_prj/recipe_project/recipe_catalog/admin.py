@@ -10,53 +10,65 @@ class IngredientInline(admin.StackedInline):
     """В рецепте есть ингредиенты."""
     model = RecipeIngredient
     extra = 1
-    fields = ['ingredient', 'count_text', 'count']
+    fields = ['ingredient', 'unit', "weight_by_pcs", 'count']
+    verbose_name = "Ингредиент"
+    verbose_name_plural = "Ингредиенты"
 
-    readonly_fields = ['count_text']
-
-    def count_text(self, obj):
-        if obj.ingredient.unit:
-            unit_label = obj.ingredient.unit.label
-            return f"{unit_label}"
-        return "Количество в граммах"
-
-    def ingredient(self):
-        return "Ингредиент"
-
-    def count(self):
-        return "Ингредиент"
-
-    ingredient.short_description = "Ингредиент"
-    count.short_description = "Количество"
-    count_text.short_description = "Единица измерения"
+    # def count_text(self, obj):
+    #     if obj.ingredient.unit:
+    #         unit_label = obj.ingredient.unit.label
+    #         return f"{unit_label}"
+    #     return "Количество в граммах"
+    #
+    # def ingredient(self):
+    #     return "Ингредиент"
+    #
+    # def count(self):
+    #     return "Ингредиент"
+    #
+    # ingredient.short_description = "Ингредиент"
+    # count.short_description = "Количество"
+    # count_text.short_description = "Единица измерения"
 
 
 class RecipeAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
     inlines = [IngredientInline]
-    list_display = ["recipe_name", "recipe_cooking_time", "total_weight_display", "total_calories_display"]
-    readonly_fields = ["total_weight_display", "total_calories_display", "image_tag"]
+    list_display = ["name", "cooking_time"]
+    readonly_fields = ["image_tag"]
 
-    def recipe_name(self, obj):
-        return obj.name
+    # def total_weight_display(self, obj):
+    #     return f"{obj.total_weight()} г"
+    #
+    # def total_calories_display(self, obj):
+    #     return f"{obj.total_calories()} ккал"
 
     def image_tag(self, obj):
         return format_html('<img src="{}" style="max-width:200px; max-height:200px"/>'.format(obj.image.url))
 
-    def total_weight_display(self, obj):
-        return obj.total_weight()
+    # total_weight_display.short_description = "Итоговый вес"
+    # total_calories_display.short_description = "Итоговая калорийность"
 
-    def total_calories_display(self, obj):
-        return obj.total_calories()
-
-    def recipe_cooking_time(self, obj):
-        return obj.cooking_time
-
-    recipe_name.short_description = "Название"
-    image_tag.short_description = "Фото"
-    recipe_cooking_time.short_description = "Время готовки"
-    total_weight_display.short_description = "Итоговый вес (грамм)"
-    total_calories_display.short_description = "Итоговая калорийность (ккал)"
+    # def recipe_name(self, obj):
+    #     return obj.name
+    #
+    # def image_tag(self, obj):
+    #     return format_html('<img src="{}" style="max-width:200px; max-height:200px"/>'.format(obj.image.url))
+    #
+    # # def total_weight_display(self, obj):
+    # #     return obj.total_weight()
+    # #
+    # # def total_calories_display(self, obj):
+    # #     return obj.total_calories()
+    #
+    # def recipe_cooking_time(self, obj):
+    #     return obj.cooking_time
+    #
+    # recipe_name.short_description = "Название"
+    # image_tag.short_description = "Фото"
+    # recipe_cooking_time.short_description = "Время готовки"
+    # total_weight_display.short_description = "Итоговый вес (грамм)"
+    # total_calories_display.short_description = "Итоговая калорийность (ккал)"
 
 
 admin.site.register(Recipe, RecipeAdmin)
