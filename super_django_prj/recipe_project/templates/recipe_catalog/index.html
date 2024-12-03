@@ -9,9 +9,9 @@
     {% for recipe in recipes %}
     <div class="col-md-6 col-lg-4 mb-4">
         <div class="card shadow-sm rounded-4 bg-light-pink">
+            <img src="{{ recipe.image.url }}" class="card-img-top rounded-top-4" alt="{{ recipe.name }}">
             <div class="card-body">
                 <h5 class="card-title text-dark-pink">{{ recipe.name }}</h5>
-                <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
                 <a href="{% url 'recipe_catalog:detail' recipe.id %}" class="btn btn-outline-dark-pink rounded-4">Подробнее</a>
             </div>
         </div>

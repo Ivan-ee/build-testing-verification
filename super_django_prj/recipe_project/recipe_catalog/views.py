@@ -32,7 +32,7 @@ def detail(request, pk):
             unit_label = ri.unit.abbreviation or ri.unit.label
             unit = f"{ri.count} {unit_label}"
         else:
-            unit = f"{ri.count} г"  # Если единицы не указаны, отображаем в граммах
+            unit = f"{ri.count} г"
 
         ingredients.append({
             'name': ingredient.name,
