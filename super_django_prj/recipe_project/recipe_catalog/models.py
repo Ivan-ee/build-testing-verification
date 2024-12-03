@@ -40,52 +40,52 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    PCS = "pcs"
+    G = "g"
+    ML = "ml"
+
     name = models.CharField(max_length=300, verbose_name="Название блюда")
     description = models.TextField(default="", verbose_name="Описание")
     image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
-    cooking_time = models.IntegerField(default=0, verbose_name="Время приготовления")
+    cooking_time = models.IntegerField(default=0, verbose_name="Время приготовления",
+                                       help_text="Время приготовления в минутах")
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", verbose_name="Автор", default=1)
 
-    # def total_weight(self):
-    #     total_weight = 0
-    #     for ri in self.recipeingredient_set.all():
-    #         ingredient = ri.ingredient
-    #         if ingredient.unit.key == ingredient.PCS:
-    #             weight_in_grams = ri.count * ingredient.weight_by_pcs
-    #         else:
-    #             if ingredient.unit:
-    #                 volume_conversion = VolumeUnitConversion.objects.filter(unit=ingredient.unit).first()
-    #                 if volume_conversion:
-    #                     weight_in_grams = ri.count * volume_conversion.weight
-    #                 else:
-    #                     weight_in_grams = ri.count
-    #             else:
-    #                 weight_in_grams = ri.count
-    #
-    #         total_weight += weight_in_grams
-    #     return total_weight
-    #
-    # def total_calories(self):
-    #     """Общая калорийность рецепта."""
-    #     total_calories = 0
-    #     for ri in self.recipeingredient_set.all():
-    #         ingredient = ri.ingredient
-    #         if ingredient.unit and ingredient.unit.key == ingredient.PCS:
-    #             weight_in_grams = ri.count * ingredient.weight_by_pcs
-    #         elif ingredient.unit:
-    #             volume_conversion = VolumeUnitConversion.objects.filter(unit=ingredient.unit).first()
-    #             if volume_conversion:
-    #                 weight_in_grams = ri.count * volume_conversion.weight
-    #             else:
-    #                 weight_in_grams = ri.count
-    #         else:
-    #             weight_in_grams = ri.count
-    #
-    #         calories = (weight_in_grams / 100) * ingredient.calories
-    #         total_calories += calories
-    #
-    #     return round(total_calories, 2)
+    def total_weight(self):
+        """Общий вес рецепта в граммах."""
+        total_weight = 0
+        for ri in self.recipeingredient_set.all():
+            if ri.unit and ri.unit.key == self.PCS:
+                weight = ri.count * ri.weight_by_pcs
+            elif ri.unit and ri.unit.key in [self.G, self.ML]:
+                weight = ri.count
+            elif ri.unit:
+                conversion = VolumeUnitConversion.objects.filter(unit=ri.unit).first()
+                weight = ri.count * (conversion.weight if conversion else 0)
+            else:
+                weight = ri.count
+            total_weight += weight
+        return total_weight
+
+    def total_calories(self):
+        """Общая калорийность рецепта."""
+        total_calories = 0
+
+        for ri in self.recipeingredient_set.all():
+            if ri.unit and ri.unit.key == self.PCS:
+                weight_in_grams = ri.count * (ri.weight_by_pcs or 0)
+            elif ri.unit and ri.unit.key in [self.G, self.ML]:
+                weight_in_grams = ri.count
+            elif ri.unit:
+                conversion = VolumeUnitConversion.objects.filter(unit=ri.unit).first()
+                weight_in_grams = ri.count * (conversion.weight if conversion else 0)
+            else:
+                weight_in_grams = ri.count
+
+            total_calories += (weight_in_grams / 100) * ri.ingredient.calories
+
+        return round(total_calories, 2)
 
     def __str__(self):
         return self.name
@@ -94,6 +94,8 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     """Один ингредиент может быть в нескольких рецептах,
     как и в одном рецепте может быть несколько ингредиентов."""
+
+    PCS = "pcs"
 
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name="Ингредиент")

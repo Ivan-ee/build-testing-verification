@@ -32,14 +32,17 @@ class IngredientInline(admin.StackedInline):
 class RecipeAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
     inlines = [IngredientInline]
-    list_display = ["name", "cooking_time"]
-    readonly_fields = ["image_tag"]
+    list_display = ["name", "cooking_time", "total_weight_display", "total_calories_display"]
+    readonly_fields = ["image_tag", "total_weight_display", "total_calories_display"]
 
-    # def total_weight_display(self, obj):
-    #     return f"{obj.total_weight()} г"
-    #
-    # def total_calories_display(self, obj):
-    #     return f"{obj.total_calories()} ккал"
+    def cooking_time(self, obj):
+        return f"{obj.cooking_time}"
+
+    def total_weight_display(self, obj):
+        return f"{obj.total_weight()}"
+
+    def total_calories_display(self, obj):
+        return f"{obj.total_calories()}"
 
     def image_tag(self, obj):
         return format_html('<img src="{}" style="max-width:200px; max-height:200px"/>'.format(obj.image.url))
@@ -63,6 +66,9 @@ class RecipeAdmin(admin.ModelAdmin):
     #     return obj.cooking_time
     #
     # recipe_name.short_description = "Название"
+    cooking_time.short_description = "Время приготовления (мин)"
+    total_weight_display.short_description = "Итоговый вес (грамм)"
+    total_calories_display.short_description = "Итоговая калорийность (ккал)"
     image_tag.short_description = "Фотография блюда"
     # recipe_cooking_time.short_description = "Время готовки"
     # total_weight_display.short_description = "Итоговый вес (грамм)"
