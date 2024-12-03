@@ -40,12 +40,12 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=300)
-    description = models.TextField(default="", help_text="Описание")
+    name = models.CharField(max_length=300, verbose_name="Название блюда")
+    description = models.TextField(default="", verbose_name="Описание")
     image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
-    cooking_time = models.IntegerField(default=0)
+    cooking_time = models.IntegerField(default=0, verbose_name="Время приготовления")
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", default=1)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", verbose_name="Автор", default=1)
 
     # def total_weight(self):
     #     total_weight = 0
@@ -96,12 +96,13 @@ class RecipeIngredient(models.Model):
     как и в одном рецепте может быть несколько ингредиентов."""
 
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name="Ингредиент")
     unit = models.ForeignKey(
         MeasurementScale,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        help_text="Выберите в чем измеряется ингредиент (граммы, штуки, миллилитры, ложки)",
         verbose_name="Единица измерения",
     )
 
@@ -113,7 +114,11 @@ class RecipeIngredient(models.Model):
         verbose_name="Вес шт/гр (опционально)",
     )
 
-    count = models.IntegerField(default=0, verbose_name="Количество")
+    count = models.IntegerField(
+        default=0,
+        verbose_name="Количество",
+        help_text="Количество выбранного ингредиента"
+    )
 
     def clean(self):
         """Валидация данных модели."""
@@ -129,10 +134,8 @@ class RecipeIngredient(models.Model):
     def get_help_text(self):
         return "Количество в граммах"
 
-    count = models.IntegerField(default=0)
-
     def __str__(self):
-        return f'{self.recipe.name} - {self.ingredient.name} ({self.count} г)'
+        return f'{self.recipe.name} - {self.ingredient.name}'
 
     class Meta:
         constraints = [

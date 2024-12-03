@@ -11,8 +11,6 @@ class IngredientInline(admin.StackedInline):
     model = RecipeIngredient
     extra = 1
     fields = ['ingredient', 'unit', "weight_by_pcs", 'count']
-    verbose_name = "Ингредиент"
-    verbose_name_plural = "Ингредиенты"
 
     # def count_text(self, obj):
     #     if obj.ingredient.unit:
@@ -65,7 +63,7 @@ class RecipeAdmin(admin.ModelAdmin):
     #     return obj.cooking_time
     #
     # recipe_name.short_description = "Название"
-    # image_tag.short_description = "Фото"
+    image_tag.short_description = "Фотография блюда"
     # recipe_cooking_time.short_description = "Время готовки"
     # total_weight_display.short_description = "Итоговый вес (грамм)"
     # total_calories_display.short_description = "Итоговая калорийность (ккал)"
