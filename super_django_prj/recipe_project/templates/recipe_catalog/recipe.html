@@ -1,19 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="mb-4">Рецепт</h1>
+<h1 class="mb-4">Рецепт: {{ title }}</h1>
 <div class="card">
     <div class="card-body">
-        <h2 class="card-title">{{ title }}</h2>
-        <p class="card-text">{{ description }}</p>
-        <p>Время приготовления: {{ cooking_time }} минут</p>
-        <p>Общий вес: {{ total_weight }} грамм</p>
-        <p>Общая калорийность: {{ total_calories }} ккал</p>
+        {% if image %}
+        <img src="{{ image }}" alt="{{ title }}" class="img-fluid mb-4" style="max-width: 100%; height: auto;">
+        {% endif %}
+        <p class="card-text"><strong>Описание:</strong> {{ description }}</p>
+        <p><strong>Время приготовления:</strong> {{ cooking_time }} минут</p>
+        <p><strong>Общий вес:</strong> {{ total_weight }} грамм</p>
+        <p><strong>Общая калорийность:</strong> {{ total_calories }} ккал</p>
 
         <h3>Ингредиенты:</h3>
-        <ul>
+        <ul class="list-group">
             {% for ingredient in ingredients %}
-            <li>{{ ingredient.name }} - {{ ingredient.unit }}</li>
+            <li class="list-group-item">{{ ingredient.name }} — {{ ingredient.unit }}</li>
             {% endfor %}
         </ul>
     </div>

@@ -26,21 +26,17 @@ def detail(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
 
     ingredients = []
-    for ri in recipe.recipeingredient_set.select_related('ingredient__unit').order_by('ingredient__name'):
+    for ri in recipe.recipeingredient_set.select_related('ingredient', 'unit').order_by('ingredient__name'):
         ingredient = ri.ingredient
-        unit = ''
-
-        if ingredient.unit:
-            if ingredient.unit.abbreviation:
-                unit = f"{ri.count} {ingredient.unit.abbreviation}"
-            else:
-                unit = f"{ri.count} {ingredient.unit.label}"
+        if ri.unit:
+            unit_label = ri.unit.abbreviation or ri.unit.label
+            unit = f"{ri.count} {unit_label}"
         else:
-            unit = f"{ri.count} г"
+            unit = f"{ri.count} г"  # Если единицы не указаны, отображаем в граммах
 
         ingredients.append({
             'name': ingredient.name,
-            'unit': unit
+            'unit': unit,
         })
 
     context = {
@@ -50,6 +46,7 @@ def detail(request, pk):
         'total_weight': recipe.total_weight(),
         'total_calories': recipe.total_calories(),
         'ingredients': ingredients,
+        'image': recipe.image.url,
     }
 
     return render(request, template_name, context)
