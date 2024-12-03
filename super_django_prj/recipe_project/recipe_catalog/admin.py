@@ -21,6 +21,25 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ["name", "author", "cooking_time", "total_weight_display", "total_calories_display"]
     readonly_fields = ["author", "image_tag", "total_weight_display", "total_calories_display"]
 
+    def get_queryset(self, request):
+        """Ограничивает список объектов только теми, которые созданы текущим пользователем."""
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
+
+    def has_change_permission(self, request, obj=None):
+        """Запрещает редактирование чужих рецептов."""
+        if obj is None:
+            return True
+        return obj.author == request.user or request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        """Запрещает удаление чужих рецептов."""
+        if obj is None:
+            return True
+        return obj.author == request.user or request.user.is_superuser
+
     def total_weight_display(self, obj):
         return f"{obj.total_weight()}"
 
