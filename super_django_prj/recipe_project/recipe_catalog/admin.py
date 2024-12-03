@@ -18,8 +18,8 @@ class IngredientInline(admin.StackedInline):
 class RecipeAdmin(admin.ModelAdmin):
     """Настройка формы админки для рецепта."""
     inlines = [IngredientInline]
-    list_display = ["name", "cooking_time", "total_weight_display", "total_calories_display"]
-    readonly_fields = ["image_tag", "total_weight_display", "total_calories_display"]
+    list_display = ["name", "author", "cooking_time", "total_weight_display", "total_calories_display"]
+    readonly_fields = ["author", "image_tag", "total_weight_display", "total_calories_display"]
 
     def total_weight_display(self, obj):
         return f"{obj.total_weight()}"
@@ -29,6 +29,11 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def image_tag(self, obj):
         return format_html('<img src="{}" style="max-width:200px; max-height:200px"/>'.format(obj.image.url))
+
+    def save_model(self, request, obj, form, change):
+        if not obj.author_id:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
 
     total_weight_display.short_description = "Итоговый вес (грамм)"
     total_calories_display.short_description = "Итоговая калорийность (ккал)"

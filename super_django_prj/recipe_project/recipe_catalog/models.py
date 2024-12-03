@@ -50,7 +50,7 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(default=0, verbose_name="Время приготовления",
                                        help_text="Время приготовления в минутах")
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", verbose_name="Автор", default=1)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", verbose_name="Автор")
 
     def total_weight(self):
         """Общий вес рецепта в граммах."""
