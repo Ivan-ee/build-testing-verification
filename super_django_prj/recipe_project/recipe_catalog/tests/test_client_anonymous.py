@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
 
@@ -20,9 +21,12 @@ class TestClientAnonymous(TestCase):
     def setUpTestData(cls):
         cls.client = Client()
 
+        cls.test_user_1 = User.objects.create_user(username='TestUser1', password='111')
+
         cls.recipe = Recipe.objects.create(
             name=cls.RECIPE_NAME,
             description=cls.RECIPE_DESC,
+            author=cls.test_user_1,
         )
 
     def test_home_page_anonymous_access(self):
