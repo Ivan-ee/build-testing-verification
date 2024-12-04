@@ -12,7 +12,7 @@ def about(request):
 
 def index(request):
     template_name = 'recipe_catalog/index.html'
-    recipes = Recipe.objects.all()
+    recipes = Recipe.objects.order_by('name')
 
     context = {
         'recipes': recipes
