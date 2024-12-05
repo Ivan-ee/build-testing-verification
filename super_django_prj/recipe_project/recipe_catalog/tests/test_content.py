@@ -21,8 +21,13 @@ class RecipeCatalogViewsTests(TestCase):
     MS_KEY_1 = "g"
     MS_ABR_1 = "г"
 
-    INGREDIENT_NAMES = ["Яблоко", "Морковь", "Груша", "Перец", "Картофель", "Сахар"]
-    RECIPE_NAMES = ["Шарлотка", "Салат Цезарь", "Оливье", "Суп Харчо", "Борщ", "Блинчики"]
+    INGREDIENT_RECIPE_1 = ["Яблоко", "Морковь", "Груша", "Рис"]
+    INGREDIENT_RECIPE_2 = ["Перец", "Картофель", "Сахар"]
+    INGREDIENT_RECIPE_3 = ["Сливки"]
+
+    RECIPE_NAME_1 = "Шарлотка"
+    RECIPE_NAME_2 = "Борщ"
+    RECIPE_NAME_3 = "Йогурт"
 
     @classmethod
     def setUpTestData(cls):
@@ -32,18 +37,35 @@ class RecipeCatalogViewsTests(TestCase):
             label=cls.MS_LABEL_1, key=cls.MS_KEY_1, abbreviation=cls.MS_ABR_1
         )
 
-        cls.ingredients = [
+        cls.ingredients_recipe_1 = [
             Ingredient.objects.create(name=name, calories=50)
-            for name in cls.INGREDIENT_NAMES
+            for name in cls.INGREDIENT_RECIPE_1
         ]
 
-        cls.recipes = [
-            Recipe.objects.create(name=name, description="Тестовое описание", author=cls.user)
-            for name in cls.RECIPE_NAMES
+        cls.ingredients_recipe_2 = [
+            Ingredient.objects.create(name=name, calories=200)
+            for name in cls.INGREDIENT_RECIPE_2
         ]
 
-        for ingredient in reversed(cls.ingredients):
-            RecipeIngredient.objects.create(recipe=cls.recipes[0], ingredient=ingredient, unit=cls.ms, count=100)
+        cls.ingredients_recipe_3 = [
+            Ingredient.objects.create(name=name, calories=200)
+            for name in cls.INGREDIENT_RECIPE_3
+        ]
+
+        cls.recipe_1 = Recipe.objects.create(name=cls.RECIPE_NAME_1, description="Тестовое описание", author=cls.user)
+
+        cls.recipe_2 = Recipe.objects.create(name=cls.RECIPE_NAME_2, description="Тестовое описание", author=cls.user)
+
+        cls.recipe_3 = Recipe.objects.create(name=cls.RECIPE_NAME_3, description="Тестовое описание", author=cls.user)
+
+        for ingredient in cls.ingredients_recipe_1:
+            RecipeIngredient.objects.create(recipe=cls.recipe_1, ingredient=ingredient, unit=cls.ms, count=100)
+
+        for ingredient in cls.ingredients_recipe_2:
+            RecipeIngredient.objects.create(recipe=cls.recipe_2, ingredient=ingredient, unit=cls.ms, count=30)
+
+        for ingredient in cls.ingredients_recipe_3:
+            RecipeIngredient.objects.create(recipe=cls.recipe_3, ingredient=ingredient, unit=cls.ms, count=200)
 
     def test_index_view(self):
         """Отображение главной страницы"""
@@ -52,12 +74,12 @@ class RecipeCatalogViewsTests(TestCase):
         with self.subTest("Проверка шаблона"):
             self.assertTemplateUsed(response, self.HOME_TEMPLATE)
 
-        expected_recipes = sorted(self.RECIPE_NAMES)
-        recipes = [recipe.name for recipe in response.context['recipes']]
+        recipes = response.context['recipes']
 
-        for expected, actual in zip(expected_recipes, recipes):
-            with self.subTest(f"Проверка вывода рецепта в алфавитном порядке {expected}"):
-                self.assertEqual(actual, expected)
+        recipe_names = [recipe.name for recipe in recipes]
+
+        with self.subTest("Проверка алфавитного порядка рецептов"):
+            self.assertEqual(recipe_names, sorted(recipe_names))
 
     def test_index_view_recipe_count_limit(self):
         """Отображение рецептов на главной странице с ограничением по количеству"""
@@ -71,22 +93,13 @@ class RecipeCatalogViewsTests(TestCase):
 
     def test_details_view(self):
         """Отображение страницы рецепта"""
-        recipe = self.recipes[0]
+        recipe = self.recipe_1
         response = self.client.get(reverse(self.DETAILS_URL, args=[recipe.pk]))
 
         with self.subTest("Проверка шаблона"):
             self.assertTemplateUsed(response, self.DETAILS_TEMPLATE)
 
         context = response.context
-
-        checks = {
-            "title": context['title'],
-            "description": context['description'],
-            "cooking_time": context['cooking_time'],
-            "total_weight": context['total_weight'],
-            "total_calories": context['total_calories'],
-        }
-
         expected_values = {
             "title": recipe.name,
             "description": recipe.description,
@@ -95,23 +108,18 @@ class RecipeCatalogViewsTests(TestCase):
             "total_calories": recipe.total_calories(),
         }
 
-        for key, actual in checks.items():
-            with self.subTest(f"Проверка {key}"):
-                self.assertEqual(actual, expected_values[key])
+        for key, expected_value in expected_values.items():
+            with self.subTest(f"Проверка значения {key}"):
+                self.assertEqual(context[key], expected_value)
+
+        ingredients_from_context = context['ingredients']
+        ingredient_names = [ingredient['name'] for ingredient in ingredients_from_context]
 
         with self.subTest("Проверка количества ингредиентов"):
-            self.assertEqual(len(context['ingredients']), len(self.INGREDIENT_NAMES))
+            self.assertEqual(len(ingredient_names), len(self.INGREDIENT_RECIPE_1))
 
-    def test_ingredients_sorted_details_view(self):
-        """Ингредиенты на странице рецепта выводятся по алфавиту"""
-        response = self.client.get(reverse(self.DETAILS_URL, args=[self.recipes[0].pk]))
-
-        ingredients_from_context = response.context['ingredients']
-
-        self.assertEqual(
-            [ingredient['name'] for ingredient in ingredients_from_context],
-            sorted(self.INGREDIENT_NAMES)
-        )
+        with self.subTest("Проверка сортировки ингредиентов"):
+            self.assertEqual(ingredient_names, sorted(self.INGREDIENT_RECIPE_1))
 
     def test_about_view(self):
         """Страница о нас"""
