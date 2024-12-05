@@ -43,56 +43,61 @@ class TestClientAuth(TestCase):
         )
 
         cls.client_1 = Client()
-        # cls.client_1.session.clear()
         cls.client_1.force_login(cls.test_user_1)
-        # cls.client_1.session.save()
 
         cls.client_2 = Client()
-        # cls.client_2.session.clear()
         cls.client_2.force_login(cls.test_user_2)
-        # cls.client_2.session.save()
 
     def test_home_page_auth_access(self):
-        """Главная страница доступна залогиненному пользователю."""
-        response_1 = self.client_1.get(self.HOME_URL)
-        response_2 = self.client_2.get(self.HOME_URL)
-
-        self.assertEqual(response_1.status_code, HTTPStatus.OK)
-        self.assertEqual(response_2.status_code, HTTPStatus.OK)
+        """Главная страница доступна залогиненным пользователям."""
+        for client in (self.client_1, self.client_2):
+            with self.subTest(client=client):
+                response = client.get(self.HOME_URL)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_about_page_auth_access(self):
-        """Страница Описания доступна залогиненному пользователю."""
-        response = self.client_1.get(self.ABOUT_URL)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        """Страница описания доступна залогиненному пользователю."""
+        for client in (self.client_1, self.client_2):
+            with self.subTest(client=client):
+                response = client.get(self.ABOUT_URL)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_recipe_detail_auth_access(self):
-        """Страница рецепта доступна залогиненному пользователю."""
-        url = reverse(self.DETAIL_URL, args=[self.recipe_user_1.pk])
-        response = self.client_1.get(url)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        """Страница рецепта доступна залогиненному пользователям"""
+        for recipe, client in (
+                (self.recipe_user_1, self.client_1),
+                (self.recipe_user_2, self.client_2),
+        ):
+            with self.subTest(recipe=recipe, client=client):
+                url = reverse(self.DETAIL_URL, args=[recipe.pk])
+                response = client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_login_page_auth_success(self):
-        """Страница админки доступна залогиненному пользователю"""
-        response = self.client_2.get(self.ADMIN_SLUG)
-
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        """Страница админки доступна залогиненным пользователям."""
+        for client in (self.client_1, self.client_2):
+            with self.subTest(client=client):
+                response = client.get(self.ADMIN_SLUG)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_edit_recipe_page_auth_success(self):
-        """Редактирование своего рецепта доступно его автору"""
-        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_1.pk])
-        response = self.client_1.get(url)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        """Редактирование своего рецепта доступно его автору."""
+        for recipe, client in (
+                (self.recipe_user_1, self.client_1),
+                (self.recipe_user_2, self.client_2),
+        ):
+            with self.subTest(recipe=recipe, client=client):
+                url = reverse(self.ADMIN_RECIPE_CHANGE, args=[recipe.pk])
+                response = client.get(url)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
-        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_2.pk])
-        response = self.client_2.get(url)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_edit_auther_recipe_page_auth(self):
-        """Редактирование рецепта недоступно другому автору"""
-        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_1.pk])
-        response = self.client_2.get(url)
-        self.assertEqual(response.status_code, 302)
-
-        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_2.pk])
-        response = self.client_1.get(url)
-        self.assertEqual(response.status_code, 302)
+    def test_edit_author_recipe_page_auth(self):
+        """Редактирование рецепта недоступно другому автору."""
+        for recipe, client in (
+                (self.recipe_user_1, self.client_2),
+                (self.recipe_user_2, self.client_1),
+        ):
+            with self.subTest(recipe=recipe, client=client):
+                url = reverse(self.ADMIN_RECIPE_CHANGE, args=[recipe.pk])
+                response = client.get(url)
+                self.assertEqual(response.status_code, 302)
