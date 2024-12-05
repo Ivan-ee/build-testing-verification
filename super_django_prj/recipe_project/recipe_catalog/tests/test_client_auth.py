@@ -14,6 +14,9 @@ class TestClientAuth(TestCase):
     ABOUT_URL = reverse('recipe_catalog:about')
     DETAIL_URL = 'recipe_catalog:detail'
 
+    ADMIN_RECIPE_CHANGE = 'admin:recipe_catalog_recipe_change'
+    ADMIN_SLUG = '/admin/'
+
     RECIPE_1_NAME = 'Рецепт 1'
     RECIPE_1_DESC = 'Описание'
     INGREDIENT_1_NAME = 'Ингредиент 1'
@@ -70,26 +73,26 @@ class TestClientAuth(TestCase):
 
     def test_login_page_auth_success(self):
         """Страница админки доступна залогиненному пользователю"""
-        response = self.client_2.get('/admin/')
+        response = self.client_2.get(self.ADMIN_SLUG)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_edit_recipe_page_auth_success(self):
         """Редактирование своего рецепта доступно его автору"""
-        url = reverse('admin:recipe_catalog_recipe_change', args=[self.recipe_user_1.pk])
+        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_1.pk])
         response = self.client_1.get(url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-        url = reverse('admin:recipe_catalog_recipe_change', args=[self.recipe_user_2.pk])
+        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_2.pk])
         response = self.client_2.get(url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_edit_auther_recipe_page_auth(self):
         """Редактирование рецепта недоступно другому автору"""
-        url = reverse('admin:recipe_catalog_recipe_change', args=[self.recipe_user_1.pk])
+        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_1.pk])
         response = self.client_2.get(url)
         self.assertEqual(response.status_code, 302)
 
-        url = reverse('admin:recipe_catalog_recipe_change', args=[self.recipe_user_2.pk])
+        url = reverse(self.ADMIN_RECIPE_CHANGE, args=[self.recipe_user_2.pk])
         response = self.client_1.get(url)
         self.assertEqual(response.status_code, 302)
