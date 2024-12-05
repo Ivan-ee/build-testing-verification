@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 
@@ -12,10 +13,14 @@ def about(request):
 
 def index(request):
     template_name = 'recipe_catalog/index.html'
-    recipes = Recipe.objects.order_by('name')
+    recipes_list = Recipe.objects.order_by('name')  # Получаем все рецепты
+    paginator = Paginator(recipes_list, 10)  # Разбиваем на страницы, по 10 рецептов на каждой
+
+    page_number = request.GET.get('page')  # Получаем номер текущей страницы из GET-параметров
+    recipes = paginator.get_page(page_number)  # Берем соответствующую страницу
 
     context = {
-        'recipes': recipes
+        'recipes': recipes  # Передаем объект пагинации
     }
 
     return render(request, template_name, context)
