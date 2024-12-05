@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 
 class MeasurementScale(models.Model):
     label = models.CharField(max_length=50, verbose_name="Единица измерения")
-    key = models.CharField(max_length=10, unique=True, verbose_name="Сокращение")
+    key = models.CharField(max_length=10, verbose_name="Сокращение")
     abbreviation = models.TextField(default="")
 
     def __str__(self):
