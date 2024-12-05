@@ -1,11 +1,10 @@
 from http import HTTPStatus
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from ..models import Recipe, Ingredient
+from ..models import Recipe
 
 
 class TestClientAnonymous(TestCase):
@@ -20,24 +19,23 @@ class TestClientAnonymous(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.client = Client()
-
         cls.test_user_1 = User.objects.create_user(username='TestUser1', password='111')
-
         cls.recipe = Recipe.objects.create(
             name=cls.RECIPE_NAME,
             description=cls.RECIPE_DESC,
             author=cls.test_user_1,
         )
 
-    def test_home_page_anonymous_access(self):
-        """Главная страница доступна анонимному пользователю."""
-        response = self.client.get(self.HOME_URL)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_about_page_anonymous_access(self):
-        """Страница Описания доступна анонимному пользователю."""
-        response = self.client.get(self.ABOUT_URL)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    def test_pages_anonymous_access(self):
+        """Главная и страница описания доступны анонимному пользователю."""
+        urls = [
+            (self.HOME_URL, HTTPStatus.OK),
+            (self.ABOUT_URL, HTTPStatus.OK),
+        ]
+        for url, expected_status in urls:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, expected_status)
 
     def test_recipe_detail_anonymous_access(self):
         """Страница рецепта доступна анонимному пользователю."""
@@ -46,14 +44,14 @@ class TestClientAnonymous(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_anonymous_to_login(self):
-        """Анонимный пользователь перенаправляется на страницу логина при попытке войти в ЛК."""
+        """Вход в админку"""
         response = self.client.get('/admin/')
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertRedirects(response, "/admin/login/?next=/admin/")
 
     def test_login_page_anonymous_success(self):
-        """Страница логина доступна анонимному пользователю"""
-        response = self.client.get('/admin/login/?next=/admin/')
-
+        """Страница логина доступна анонимному пользователю."""
+        url = '/admin/login/?next=/admin/'
+        response = self.client.get(url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
