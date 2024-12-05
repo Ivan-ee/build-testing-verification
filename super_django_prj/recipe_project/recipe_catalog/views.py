@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 
 from .models import Recipe
@@ -13,14 +13,14 @@ def about(request):
 
 def index(request):
     template_name = 'recipe_catalog/index.html'
-    recipes_list = Recipe.objects.order_by('name')  # Получаем все рецепты
-    paginator = Paginator(recipes_list, 10)  # Разбиваем на страницы, по 10 рецептов на каждой
+    recipes_list = Recipe.objects.order_by('name')
+    paginator = Paginator(recipes_list, settings.OBJS_ON_PAGE)
 
-    page_number = request.GET.get('page')  # Получаем номер текущей страницы из GET-параметров
-    recipes = paginator.get_page(page_number)  # Берем соответствующую страницу
+    page_number = request.GET.get('page')
+    recipes = paginator.get_page(page_number)
 
     context = {
-        'recipes': recipes  # Передаем объект пагинации
+        'recipes': recipes
     }
 
     return render(request, template_name, context)
