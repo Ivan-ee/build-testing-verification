@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
 from django.utils.html import mark_safe
 from django.contrib.auth.models import User
@@ -8,8 +9,8 @@ from django.core.exceptions import ValidationError
 
 
 class MeasurementScale(models.Model):
-    label = models.CharField(max_length=50, unique=True, verbose_name="Единица измерения")
-    key = models.CharField(max_length=10, unique=True, verbose_name="Сокращение")
+    label = models.TextField(max_length=50, unique=True, verbose_name="Единица измерения")
+    key = models.TextField(max_length=10, unique=True, verbose_name="Сокращение")
     abbreviation = models.TextField(default="")
 
     def __str__(self):
@@ -27,12 +28,20 @@ class VolumeUnitConversion(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=255, unique=True, verbose_name="Название")
+    name = models.TextField(max_length=255, null=False, default="Ингредиент", unique=True, verbose_name="Название",
+                            validators=[
+                                RegexValidator(
+                                    regex=r'^[A-Za-zА-Яа-яёЁ\s]+$',
+                                    message='Name should be a string value.'
+                                )
+                            ]
+                            )
 
     calories = models.IntegerField(
         default=0,
         help_text="Калорийность на 100 ед. изм.",
         verbose_name="Калорийность",
+        validators=[MinValueValidator(1, 'Conversion rate must be positive.')]
     )
 
     def __str__(self):
@@ -44,11 +53,11 @@ class Recipe(models.Model):
     G = "g"
     ML = "ml"
 
-    name = models.CharField(max_length=300, verbose_name="Название блюда")
+    name = models.TextField(max_length=300, verbose_name="Название блюда")
     description = models.TextField(default="", verbose_name="Описание")
     image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
     cooking_time = models.IntegerField(default=0, verbose_name="Время приготовления",
-                                       help_text="Время приготовления в минутах")
+                                       help_text="Время приготовления в минутах",validators=[MinValueValidator(1, 'Conversion rate must be positive.')])
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", verbose_name="Автор")
 
