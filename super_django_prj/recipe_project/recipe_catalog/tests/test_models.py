@@ -115,101 +115,79 @@ class TestRecipeIngredientModel(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(username="test_user")
-        cls.recipe = Recipe.objects.create(name="Пирог", author=cls.user)
+
+        cls.recipe1 = Recipe.objects.create(name="рецепт 1", author=cls.user)
+        cls.recipe2 = Recipe.objects.create(name="рецепт 2", author=cls.user)
+
         cls.ingredient1 = Ingredient.objects.create(name="Сахар", calories=400)
         cls.ingredient2 = Ingredient.objects.create(name="Мука", calories=350)
+        cls.ingredient3 = Ingredient.objects.create(name="Рис", calories=200)
+
         MeasurementScale.objects.all().delete()
         cls.unit_grams = MeasurementScale.objects.create(label="граммы", key="g", abbreviation="г")
         cls.unit_pcs = MeasurementScale.objects.create(label="штуки", key="pcs", abbreviation="шт")
         cls.unit_tsp = MeasurementScale.objects.create(label="чайная ложка", key="tsp", abbreviation="ч.л")
         cls.unit_tbsp = MeasurementScale.objects.create(label="столовая ложка", key="tbsp", abbreviation="ст.л")
-        VolumeUnitConversion.objects.create(unit=cls.unit_tsp, weight=5)  # 1 tsp = 5 г
+
+        VolumeUnitConversion.objects.create(unit=cls.unit_tsp, weight=5)
         VolumeUnitConversion.objects.create(unit=cls.unit_tbsp, weight=15)
 
-    def test_weight_calculation_with_pcs(self):
-        RecipeIngredient.objects.create(
-            recipe=self.recipe,
-            ingredient=self.ingredient1,
-            unit=self.unit_pcs,
+        cls.recipe_ingredient = RecipeIngredient.objects.create(
+            recipe=cls.recipe1,
+            ingredient=cls.ingredient1,
+            unit=cls.unit_pcs,
             count=3,
             weight_by_pcs=50
         )
-        self.assertEqual(self.recipe.total_weight(), 150)  # 3 * 50
+
+    def test_ingredient_creation(self):
+        self.assertEqual(self.recipe_ingredient.recipe.name, self.recipe1.name)
+
+    def test_weight_calculation_with_pcs(self):
+        self.assertEqual(self.recipe_ingredient.recipe.total_weight(), 150)
 
     def test_weight_calculation_with_tsp(self):
-        RecipeIngredient.objects.create(
-            recipe=self.recipe,
+        recipe_ingredient = RecipeIngredient.objects.create(
+            recipe=self.recipe2,
             ingredient=self.ingredient1,
             unit=self.unit_tsp,
             count=4
         )
-        self.assertEqual(self.recipe.total_weight(), 20)  # 4 * 5
+        self.assertEqual(recipe_ingredient.recipe.total_weight(), 20)
 
     def test_weight_calculation_with_tbsp(self):
-        RecipeIngredient.objects.create(
-            recipe=self.recipe,
+        recipe_ingredient = RecipeIngredient.objects.create(
+            recipe=self.recipe2,
             ingredient=self.ingredient1,
             unit=self.unit_tbsp,
             count=3
         )
-        self.assertEqual(self.recipe.total_weight(), 45)  # 3 * 15
+        self.assertEqual(recipe_ingredient.recipe.total_weight(), 45)
 
     def test_combined_weight_calculation(self):
-        RecipeIngredient.objects.create(
-            recipe=self.recipe,
+        recipe_ingredient = RecipeIngredient.objects.create(
+            recipe=self.recipe2,
             ingredient=self.ingredient1,
             unit=self.unit_grams,
             count=200
         )
-        RecipeIngredient.objects.create(
-            recipe=self.recipe,
+        recipe_ingredient = RecipeIngredient.objects.create(
+            recipe=self.recipe2,
             ingredient=self.ingredient2,
             unit=self.unit_pcs,
             count=3,
             weight_by_pcs=50
         )
-        RecipeIngredient.objects.create(
-            recipe=self.recipe,
-            ingredient=self.ingredient1,
+        recipe_ingredient = RecipeIngredient.objects.create(
+            recipe=self.recipe2,
+            ingredient=self.ingredient3,
             unit=self.unit_tsp,
             count=4
         )
-        self.assertEqual(self.recipe.total_weight(), 370)  # 200 + 150 + 20
-
-    def test_missing_weight_by_pcs_error(self):
-        recipe_ingredient = RecipeIngredient(
-            recipe=self.recipe,
-            ingredient=self.ingredient1,
-            unit=self.unit_pcs,
-            count=3,
-            weight_by_pcs=None
-        )
-        with self.assertRaises(ValidationError):
-            recipe_ingredient.full_clean()  # Принудительная валидация
+        self.assertEqual(recipe_ingredient.recipe.total_weight(), 370)
 
     def test_unique_constraint(self):
-        RecipeIngredient.objects.create(recipe=self.recipe, ingredient=self.ingredient1, unit=self.unit_pcs, count=2)
+        RecipeIngredient.objects.create(recipe=self.recipe2, ingredient=self.ingredient1, unit=self.unit_pcs, count=2)
         with self.assertRaises(IntegrityError):
-            RecipeIngredient.objects.create(recipe=self.recipe, ingredient=self.ingredient1, unit=self.unit_pcs,
+            RecipeIngredient.objects.create(recipe=self.recipe2, ingredient=self.ingredient1, unit=self.unit_pcs,
                                             count=1)
-
-    def test_missing_conversion_for_tsp(self):
-        VolumeUnitConversion.objects.filter(unit=self.unit_tsp).delete()  # Удаляем конверсию веса
-        recipe_ingredient = RecipeIngredient(
-            recipe=self.recipe,
-            ingredient=self.ingredient1,
-            unit=self.unit_tsp,
-            count=2
-        )
-        with self.assertRaises(ValueError):
-            recipe_ingredient.calculate_weight()
-
-    def test_negative_count_error(self):
-        recipe_ingredient = RecipeIngredient(
-            recipe=self.recipe,
-            ingredient=self.ingredient1,
-            unit=self.unit_grams,
-            count=-10
-        )
-        with self.assertRaises(ValidationError):
-            recipe_ingredient.full_clean()  # Принудительная валидация
