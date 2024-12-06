@@ -17,9 +17,9 @@ class RecipeCatalogViewsTests(TestCase):
 
     USER_NAME = "testuser"
 
-    MS_LABEL_1 = "Граммы"
-    MS_KEY_1 = "g"
-    MS_ABR_1 = "г"
+    MS_LABEL_1 = "msl"
+    MS_KEY_1 = "msk"
+    MS_ABR_1 = "msabr"
 
     INGREDIENT_RECIPE_1 = ["Яблоко", "Морковь", "Груша", "Рис"]
     INGREDIENT_RECIPE_2 = ["Перец", "Картофель", "Сахар"]
