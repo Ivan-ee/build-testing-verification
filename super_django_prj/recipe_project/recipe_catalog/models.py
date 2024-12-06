@@ -27,7 +27,7 @@ class VolumeUnitConversion(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Название")
+    name = models.CharField(max_length=255, unique=True, verbose_name="Название")
 
     calories = models.IntegerField(
         default=0,
