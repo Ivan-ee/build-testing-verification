@@ -53,11 +53,12 @@ class Recipe(models.Model):
     G = "g"
     ML = "ml"
 
-    name = models.TextField(max_length=300, verbose_name="Название блюда")
+    name = models.TextField(max_length=300, unique=True, verbose_name="Название блюда")
     description = models.TextField(default="", verbose_name="Описание")
     image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Изображение")
     cooking_time = models.IntegerField(default=0, verbose_name="Время приготовления",
-                                       help_text="Время приготовления в минутах",validators=[MinValueValidator(1, 'Conversion rate must be positive.')])
+                                       help_text="Время приготовления в минутах",
+                                       validators=[MinValueValidator(1, 'Conversion rate must be positive.')])
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes", verbose_name="Автор")
 
