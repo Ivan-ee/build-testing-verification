@@ -1,6 +1,8 @@
 from django import forms
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .forms import IngredientForm
@@ -94,6 +96,9 @@ def ingredient(request):
 
 
 def ingredient_edit(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
     template = 'recipe_catalog/ingredient_form.html'
     instance = get_object_or_404(Ingredient, pk=pk)
     form = IngredientForm(request.POST or None, instance=instance)
@@ -112,3 +117,8 @@ def ingredient_delete(request, pk):
         instance.delete()
         return redirect('recipe_catalog:ingredients')
     return render(request, template, context)
+
+
+@login_required
+def simple_view(request):
+    return HttpResponse('Привет залогиненный пользователь!')

@@ -1,3 +1,4 @@
+from django.contrib.auth import views
 from django.urls import path
 from .views import about, index, detail, user_form_test, ingredient, ingredient_edit, ingredient_delete
 
@@ -14,4 +15,6 @@ urlpatterns = [
                   path('ingredient/', ingredient, name='ingredient'),
                   path('ingredient/<int:pk>/edit/', ingredient_edit, name='ingredient_edit'),
                   path('ingredient/<int:pk>/delete/', ingredient_delete, name='ingredient_delete'),
+                  path('auth/login/', views.LoginView.as_view(template_name='login.html'), name='login'),
+                  path('auth/logout/', views.LogoutView.as_view(), name='logout'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
