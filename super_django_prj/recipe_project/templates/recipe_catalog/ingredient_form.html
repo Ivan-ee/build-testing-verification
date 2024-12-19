@@ -2,13 +2,18 @@
 
 {% block content %}
 <h2>Ингредиент</h2>
+{% with data=form.instance %}
 <form method="post">
     {% csrf_token %}
+    {% if not "/delete/" in request.path %}
     {{ form.as_p }}
+    {% else %}
+    <p>{{ data.name }}</p>
+    <p>{{ data.calories }} ккал</p>
+    {% endif %}
     <input type="submit" value="Submit">
 </form>
 
-{% with data=form.instance %}
 {% if form.is_valid %}
 ID новой записи в БД: {{ data.id }}
 {% endif %}
