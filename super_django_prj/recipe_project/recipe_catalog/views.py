@@ -2,11 +2,13 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.forms import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 
-from .forms import IngredientForm
-from .models import Recipe, Ingredient
+from .forms import IngredientForm, RecipeForm, RecipeIngredientForm
+from .models import Recipe, Ingredient, RecipeIngredient
 
 
 def about(request):
@@ -122,3 +124,62 @@ def ingredient_delete(request, pk):
 @login_required
 def simple_view(request):
     return HttpResponse('Привет залогиненный пользователь!')
+
+
+@login_required
+def recipe_create(request):
+    RecipeIngredientFormSet = inlineformset_factory(
+        Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=3, can_delete=True
+    )
+
+    if request.method == "POST":
+        form = RecipeForm(request.POST, request.FILES)
+        formset = RecipeIngredientFormSet(request.POST, instance=Recipe())
+
+        if form.is_valid() and formset.is_valid():
+            recipe = form.save(commit=False)
+            recipe.author = request.user  # Установить текущего пользователя автором
+            recipe.save()
+            formset.instance = recipe
+            formset.save()
+            # Возвращаем redirect на список рецептов
+            return redirect('recipe_catalog:home')  # Замените 'recipe_list' на имя вашего маршрута
+    else:
+        form = RecipeForm()
+        formset = RecipeIngredientFormSet(instance=Recipe())
+
+    return render(request, 'recipe_catalog/recipe_form.html', {
+        'form': form,
+        'formset': formset
+    })
+
+
+def recipe_edit(request, pk):
+    RecipeIngredientFormSet = inlineformset_factory(
+        Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=3, can_delete=True
+    )
+    recipe = get_object_or_404(Recipe, pk=pk)
+
+    if request.method == "POST":
+        form = RecipeForm(request.POST, request.FILES, instance=recipe)
+        formset = RecipeIngredientFormSet(request.POST, instance=recipe)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            return redirect('recipe_catalog:detail', pk=pk)
+    else:
+        form = RecipeForm(instance=recipe)
+        formset = RecipeIngredientFormSet(instance=recipe)
+
+    return render(request, 'recipe_catalog/recipe_form.html', {
+        'form': form,
+        'formset': formset
+    })
+
+
+def recipe_delete(request, pk):
+    recipe = get_object_or_404(Recipe, pk=pk)
+    if request.method == "POST":
+        recipe.delete()
+        return redirect(reverse('recipe_catalog:home'))
+    return render(request, 'recipe_catalog/recipe_confirm_delete.html', {'recipe': recipe})

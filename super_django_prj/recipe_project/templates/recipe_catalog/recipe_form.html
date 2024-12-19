@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}
+{% if form.instance.pk %}
+Редактировать рецепт
+{% else %}
+Создать рецепт
+{% endif %}
+{% endblock %}
+{% block content %}
+<h1>
+    {% if form.instance.pk %}
+    Редактировать рецепт
+    {% else %}
+    Создать рецепт
+    {% endif %}
+</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+        {{ form.name }}
+        {{ form.name.errors }}
+    </div>
+    <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+        {{ form.description }}
+        {{ form.description.errors }}
+    </div>
+    <div class="mb-3">
+        <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+        {{ form.image }}
+        {{ form.image.errors }}
+    </div>
+    <div class="mb-3">
+        <label for="{{ form.cooking_time.id_for_label }}" class="form-label">{{ form.cooking_time.label }}</label>
+        {{ form.cooking_time }}
+        {{ form.cooking_time.errors }}
+    </div>
+    <hr>
+    <h2>Ингредиенты</h2>
+    {{ formset.management_form }}
+    {% for form_ingredient in formset %}
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        {{ form_ingredient.as_p }}
+        {% if form_ingredient.instance.pk %}
+        <label for="id_recipeingredient_set-{{ forloop.counter0 }}-DELETE">Удалить?</label>
+        {{ form_ingredient.DELETE }}
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">
+        {% if form.instance.pk %}
+        Сохранить
+        {% else %}
+        Создать
+        {% endif %}
+    </button>
+    <a href="{% url 'recipe_catalog:home' %}" class="btn btn-secondary">Отмена</a>
+
+</form>
+{% endblock %}

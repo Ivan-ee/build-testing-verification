@@ -1,11 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator, MinValueValidator
-from django.db import models
-from django.utils.html import mark_safe
-from django.contrib.auth.models import User
 
 from django.db import models
 
 from django.core.exceptions import ValidationError
+
+User = get_user_model()
 
 
 class MeasurementScale(models.Model):
