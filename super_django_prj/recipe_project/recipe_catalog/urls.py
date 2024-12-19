@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import about, index, detail, user_form_test
+from .views import about, index, detail, user_form_test, ingredient, ingredient_edit
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,4 +11,6 @@ urlpatterns = [
                   path('recipe/<int:pk>/', detail, name='detail'),
                   path('about/', about, name='about'),
                   path('user_form_test/', user_form_test, name='create_user_test'),
+                  path('ingredient/', ingredient, name='ingredient'),
+                  path('ingredient/<int:pk>/edit/', ingredient_edit, name='ingredient_edit'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

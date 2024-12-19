@@ -3,7 +3,8 @@ from django.core.paginator import Paginator
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 
-from .models import Recipe
+from .forms import IngredientForm
+from .models import Recipe, Ingredient
 
 
 def about(request):
@@ -77,6 +78,7 @@ def user_form_test(request):
     context = {'form': form}
     return render(request, template, context)
 
+
 def ingredient(request):
     template = 'recipe_catalog/ingredient_form.html'
     form = IngredientForm(request.POST or None)
@@ -84,4 +86,14 @@ def ingredient(request):
     if form.is_valid():
         form.save()
     context = {'form': form}
+    return render(request, template, context)
+
+
+def ingredient_edit(request, pk):
+    template = 'recipe_catalog/ingredient_form.html'
+    instance = get_object_or_404(Ingredient, pk=pk)
+    form = IngredientForm(request.POST or None, instance=instance)
+    context = {'form': form}
+    if form.is_valid():
+        form.save()
     return render(request, template, context)
