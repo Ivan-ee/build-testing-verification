@@ -1,3 +1,4 @@
+from django import forms
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
@@ -55,3 +56,32 @@ def detail(request, pk):
     }
 
     return render(request, template_name, context)
+
+
+class UserForm(forms.Form):
+    first_name = forms.CharField(label='Имя', max_length=20)
+    last_name = forms.CharField(label='Фамилия', required=False)
+    user_email = forms.EmailField(label='Email', required=False)
+
+
+def user_form_test(request):
+    template = 'recipe_catalog/user_form_test.html'
+    if request.method == 'GET':
+        form = UserForm(request.GET)
+        if form.is_valid():
+            pass
+
+    else:
+        form = UserForm()
+
+    context = {'form': form}
+    return render(request, template, context)
+
+def ingredient(request):
+    template = 'recipe_catalog/ingredient_form.html'
+    form = IngredientForm(request.POST or None)
+    context = {'form': form}
+    if form.is_valid():
+        form.save()
+    context = {'form': form}
+    return render(request, template, context)
