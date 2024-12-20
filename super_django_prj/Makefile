@@ -18,3 +18,13 @@ report:
 
 report-html:
 	cd recipe_project && coverage html
+
+docker-migrate:
+	docker exec super_django_prj-django-1 python manage.py migrate
+
+docker-test:
+	docker exec super_django_prj-django-1 python manage.py test
+
+docker-lint:
+	docker exec super_django_prj-django-1  flake8
+
