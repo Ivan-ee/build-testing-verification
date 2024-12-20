@@ -11,6 +11,14 @@ class TestClientAnonymous(TestCase):
     HOME_URL = reverse('recipe_catalog:home')
     ABOUT_URL = reverse('recipe_catalog:about')
     DETAIL_URL = 'recipe_catalog:detail'
+    RECIPE_CREATE_URL = reverse('recipe_catalog:recipe_create')
+    INGREDIENT_CREATE_URL = reverse('recipe_catalog:ingredient')
+    INGREDIENTS_LIST_URL = reverse('recipe_catalog:ingredients_list')
+    MY_RECIPES_URL = reverse('recipe_catalog:my_recipes')
+    RECIPE_EDIT_URL = 'recipe_catalog:recipe_edit'
+    RECIPE_DELETE_URL = 'recipe_catalog:recipe_delete'
+    INGREDIENT_EDIT_URL = 'recipe_catalog:ingredient_edit'
+    INGREDIENT_DELETE_URL = 'recipe_catalog:ingredient_delete'
 
     RECIPE_NAME = 'Яичница'
     RECIPE_DESC = 'Вкусная яичница'
@@ -55,3 +63,47 @@ class TestClientAnonymous(TestCase):
         url = '/admin/login/?next=/admin/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_anonymous_user_cant_create_recipe(self):
+        """Анонимный пользователь не может создать рецепт"""
+        response = self.client.get(self.RECIPE_CREATE_URL)
+        self.assertRedirects(response, f'/auth/login/?next={self.RECIPE_CREATE_URL}')
+
+    def test_anonymous_user_cant_create_ingredient(self):
+        """Анонимный пользователь не может создать ингредиент"""
+        response = self.client.get(self.INGREDIENT_CREATE_URL)
+        self.assertRedirects(response, f'/auth/login/?next={self.INGREDIENT_CREATE_URL}')
+
+    def test_anonymous_user_cant_access_ingredients_list(self):
+        """Анонимный пользователь не может просмотреть список ингредиентов"""
+        response = self.client.get(self.INGREDIENTS_LIST_URL)
+        self.assertRedirects(response, f'/auth/login/?next={self.INGREDIENTS_LIST_URL}')
+
+    def test_anonymous_user_cant_access_my_recipes(self):
+        """Анонимный пользователь не может просмотреть свои рецепты"""
+        response = self.client.get(self.MY_RECIPES_URL)
+        self.assertRedirects(response, f'/auth/login/?next={self.MY_RECIPES_URL}')
+
+    def test_anonymous_user_cant_edit_recipe(self):
+        """Анонимный пользователь не может редактировать рецепт"""
+        url = reverse(self.RECIPE_EDIT_URL, args=[self.recipe.pk])
+        response = self.client.get(url)
+        self.assertRedirects(response, f'/auth/login/?next={url}')
+
+    def test_anonymous_user_cant_delete_recipe(self):
+        """Анонимный пользователь не может удалить рецепт"""
+        url = reverse(self.RECIPE_DELETE_URL, args=[self.recipe.pk])
+        response = self.client.get(url)
+        self.assertRedirects(response, f'/auth/login/?next={url}')
+
+    def test_anonymous_user_cant_edit_ingredient(self):
+        """Анонимный пользователь не может редактировать ингредиент"""
+        url = reverse(self.INGREDIENT_EDIT_URL, args=[1])
+        response = self.client.get(url)
+        self.assertRedirects(response, f'/auth/login/?next={url}')
+
+    def test_anonymous_user_cant_delete_ingredient(self):
+        """Анонимный пользователь не может удалить ингредиент"""
+        url = reverse(self.INGREDIENT_DELETE_URL, args=[1])
+        response = self.client.get(url)
+        self.assertRedirects(response, f'/auth/login/?next={url}')
