@@ -10,6 +10,10 @@ User = get_user_model()
 
 
 class TestClientAuth(TestCase):
+    HOME_URL = reverse('recipe_catalog:home')
+    ABOUT_URL = reverse('recipe_catalog:about')
+    DETAIL_URL = 'recipe_catalog:detail'
+
     RECIPE_1_NAME = 'Рецепт 1'
     RECIPE_1_DESC = 'Описание'
     RECIPE_1_COOKING_TIME = 10
@@ -21,6 +25,9 @@ class TestClientAuth(TestCase):
     NEW_RECIPE_DESCRIPTION = "Новое описание"
     NEW_INGREDIENT_NAME = "Новый ингредиент"
     NEW_INGREDIENT_CALORIES = 300
+
+    RECIPE_2_NAME = 'Рецепт 2'
+    RECIPE_2_DESC = 'Описание'
 
     @classmethod
     def setUpTestData(cls):
@@ -59,6 +66,20 @@ class TestClientAuth(TestCase):
             "name": cls.NEW_INGREDIENT_NAME,
             "calories": cls.NEW_INGREDIENT_CALORIES
         }
+
+    def test_home_page_auth_access(self):
+        """Главная страница доступна залогиненным пользователям."""
+        for client in (self.client_1, self.client_2):
+            with self.subTest(client=client):
+                response = client.get(self.HOME_URL)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_about_page_auth_access(self):
+        """Страница описания доступна залогиненному пользователю."""
+        for client in (self.client_1, self.client_2):
+            with self.subTest(client=client):
+                response = client.get(self.ABOUT_URL)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_author_can_create_recipe(self):
         """Авторизованный пользователь может создать рецепт."""
@@ -112,7 +133,6 @@ class TestClientAuth(TestCase):
         url_edit = reverse('recipe_catalog:recipe_edit', args=[recipe_user_1.pk])
         response_edit = self.client_1.post(url_edit, data={"name": "New Name"})
         self.assertEqual(response_edit.status_code, 200, "Автор может отредактировать свой рецепт")
-
 
     def test_author_can_edit_ingredient(self):
         """Автор может редактировать свой ингредиент"""
