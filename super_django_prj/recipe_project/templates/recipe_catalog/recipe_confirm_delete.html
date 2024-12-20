@@ -1,10 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Удалить рецепт "{{ recipe.name }}"?</h2>
+<h2>Удаление рецепта</h2>
+{% with data=recipe %}
 <form method="post">
     {% csrf_token %}
-    <button type="submit">Да, удалить</button>
-    <a href="{% url 'recipe_catalog:recipe_detail' recipe.id %}">Отмена</a>
+    <p>Вы действительно хотите удалить рецепт: </p>
+    <p>{{ data.name }}</p>
+
+    <button type="submit" class="btn btn-danger">Удалить</button>
+    <a href="{% url 'recipe_catalog:detail' pk=recipe.id %}" class="btn btn-secondary">Отмена</a>
+
 </form>
+{% endwith %}
 {% endblock %}

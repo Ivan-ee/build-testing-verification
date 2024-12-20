@@ -17,7 +17,7 @@ class IngredientForm(forms.ModelForm):
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ('name', 'description', 'image', 'cooking_time')
+        fields = ('name', 'description', 'image', 'cooking_time')  # Убираем поле ingredients
         labels = {
             'name': 'Название блюда',
             'description': 'Описание',
@@ -39,3 +39,12 @@ class RecipeIngredientForm(forms.ModelForm):
             'weight_by_pcs': 'Вес шт/гр (опционально)',
             'count': 'Количество',
         }
+
+
+RecipeIngredientFormSet = inlineformset_factory(
+    Recipe,
+    RecipeIngredient,
+    form=RecipeIngredientForm,
+    extra=2,
+    can_delete=True,
+)

@@ -2,12 +2,11 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.conf import settings
-from django.forms import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 
-from .forms import IngredientForm, RecipeForm, RecipeIngredientForm
+from .forms import IngredientForm, RecipeForm, RecipeIngredientForm, RecipeIngredientFormSet
 from .models import Recipe, Ingredient, RecipeIngredient
 
 
@@ -128,17 +127,13 @@ def simple_view(request):
 
 @login_required
 def recipe_create(request):
-    RecipeIngredientFormSet = inlineformset_factory(
-        Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=3, can_delete=True
-    )
-
     if request.method == "POST":
         form = RecipeForm(request.POST, request.FILES)
         formset = RecipeIngredientFormSet(request.POST, instance=Recipe())
 
         if form.is_valid() and formset.is_valid():
             recipe = form.save(commit=False)
-            recipe.author = request.user  # Установить текущего пользователя автором
+            recipe.author = request.user  # Укажите текущего пользователя как автора
             recipe.save()
             formset.instance = recipe
             formset.save()
@@ -147,7 +142,6 @@ def recipe_create(request):
     else:
         form = RecipeForm()
         formset = RecipeIngredientFormSet(instance=Recipe())
-
     return render(request, 'recipe_catalog/recipe_form.html', {
         'form': form,
         'formset': formset
@@ -155,21 +149,20 @@ def recipe_create(request):
 
 
 def recipe_edit(request, pk):
-    RecipeIngredientFormSet = inlineformset_factory(
-        Recipe, RecipeIngredient, form=RecipeIngredientForm, extra=3, can_delete=True
-    )
     recipe = get_object_or_404(Recipe, pk=pk)
 
     if request.method == "POST":
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
         formset = RecipeIngredientFormSet(request.POST, instance=recipe)
+
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
-            return redirect('recipe_catalog:detail', pk=pk)
+            return redirect('recipe_catalog:home', pk=pk)
+
     else:
         form = RecipeForm(instance=recipe)
-        formset = RecipeIngredientFormSet(instance=recipe)
+        formset = RecipeIngredientFormSet(instance=recipe)  # Создаем formset и для GET
 
     return render(request, 'recipe_catalog/recipe_form.html', {
         'form': form,
