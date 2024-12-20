@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from ..models import Recipe
+from ..models import Recipe, Ingredient
 
 
 class TestClientAnonymous(TestCase):
@@ -23,6 +23,7 @@ class TestClientAnonymous(TestCase):
     RECIPE_NAME = 'Яичница'
     RECIPE_DESC = 'Вкусная яичница'
     INGREDIENT_NAME = 'Яйцо'
+    RECEIPT_STEPS = 'Процесс приготовления...'
 
     @classmethod
     def setUpTestData(cls):
@@ -33,6 +34,12 @@ class TestClientAnonymous(TestCase):
             description=cls.RECIPE_DESC,
             author=cls.test_user_1,
         )
+
+        cls.url_recipe_create = reverse('recipe_catalog:recipe_create')
+        cls.url_ingredient_create = reverse('recipe_catalog:ingredient')
+
+        cls.data_recipe = {'title': 'Test Recipe'}
+        cls.data_ingredient = {'title': 'Test Ingredient'}
 
     def test_pages_anonymous_access(self):
         """Главная и страница описания доступны анонимному пользователю."""
@@ -68,42 +75,59 @@ class TestClientAnonymous(TestCase):
         """Анонимный пользователь не может создать рецепт"""
         response = self.client.get(self.RECIPE_CREATE_URL)
         self.assertRedirects(response, f'/auth/login/?next={self.RECIPE_CREATE_URL}')
+        self.assertEqual(response.status_code, 302)
+
+        self.client.post(self.url_recipe_create, data=self.data_recipe)
+        recipes_count = Recipe.objects.count()
+        self.assertEqual(recipes_count, 1)
 
     def test_anonymous_user_cant_create_ingredient(self):
         """Анонимный пользователь не может создать ингредиент"""
         response = self.client.get(self.INGREDIENT_CREATE_URL)
         self.assertRedirects(response, f'/auth/login/?next={self.INGREDIENT_CREATE_URL}')
+        self.assertEqual(response.status_code, 302)
+
+        self.client.post(self.url_ingredient_create, data=self.data_ingredient)
+        recipes_count = Ingredient.objects.count()
+        self.assertEqual(recipes_count, 0)
 
     def test_anonymous_user_cant_access_ingredients_list(self):
         """Анонимный пользователь не может просмотреть список ингредиентов"""
         response = self.client.get(self.INGREDIENTS_LIST_URL)
         self.assertRedirects(response, f'/auth/login/?next={self.INGREDIENTS_LIST_URL}')
+        self.assertEqual(response.status_code, 302)
 
     def test_anonymous_user_cant_access_my_recipes(self):
         """Анонимный пользователь не может просмотреть свои рецепты"""
         response = self.client.get(self.MY_RECIPES_URL)
         self.assertRedirects(response, f'/auth/login/?next={self.MY_RECIPES_URL}')
+        self.assertEqual(response.status_code, 302)
 
     def test_anonymous_user_cant_edit_recipe(self):
         """Анонимный пользователь не может редактировать рецепт"""
         url = reverse(self.RECIPE_EDIT_URL, args=[self.recipe.pk])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
+        self.assertEqual(response.status_code, 302)
 
     def test_anonymous_user_cant_delete_recipe(self):
         """Анонимный пользователь не может удалить рецепт"""
         url = reverse(self.RECIPE_DELETE_URL, args=[self.recipe.pk])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
+        self.assertEqual(response.status_code, 302)
 
     def test_anonymous_user_cant_edit_ingredient(self):
         """Анонимный пользователь не может редактировать ингредиент"""
         url = reverse(self.INGREDIENT_EDIT_URL, args=[1])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
+        self.assertEqual(response.status_code, 302)
 
     def test_anonymous_user_cant_delete_ingredient(self):
         """Анонимный пользователь не может удалить ингредиент"""
         url = reverse(self.INGREDIENT_DELETE_URL, args=[1])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
+        self.assertEqual(response.status_code, 302)
+
