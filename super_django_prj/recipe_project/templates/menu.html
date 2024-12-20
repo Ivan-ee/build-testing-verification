@@ -4,6 +4,9 @@
             <li class="nav-item">
                 <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:home' %}">Главная страница</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:about' %}">О сайте</a>
+            </li>
             {% if request.user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:my_recipes' %}">Мои рецепты</a>
@@ -11,10 +14,44 @@
             <li class="nav-item">
                 <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:ingredients_list' %}">Ингредиенты</a>
             </li>
-            {% endif %}
-            <li class="nav-item">
-                <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:about' %}">О сайте</a>
+            <li class="nav-item dropdown" id="user-dropdown">
+                <a class="nav-link text-dark-pink fw-bold dropdown-toggle" href="#" id="dropdownMenuButton"
+                   role="button"
+                   aria-expanded="false">
+                    {{ request.user.username }}
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="{% url 'recipe_catalog:logout' %}">Выйти</a></li>
+                </ul>
             </li>
+            {% else %}
+            <li class="nav-item dropdown" id="user-dropdown">
+                <a class="nav-link text-dark-pink fw-bold dropdown-toggle" href="#" id="dropdownMenuButton"
+                   role="button"
+                   aria-expanded="false">
+                    Войти
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="{% url 'recipe_catalog:login' %}">Вход</a></li>
+                    <li><a class="dropdown-item" href="{% url 'recipe_catalog:register' %}">Регистрация</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            <script>
+                document.querySelectorAll('.nav-item.dropdown').forEach(function (item) {
+                    item.addEventListener('click', function (e) {
+                        this.classList.toggle('show');
+                    });
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('.nav-item.dropdown')) {
+                        document.querySelectorAll('.nav-item.dropdown').forEach(function (item) {
+                            item.classList.remove('show');
+                        });
+                    }
+                });
+            </script>
         </ul>
     </nav>
 </header>
