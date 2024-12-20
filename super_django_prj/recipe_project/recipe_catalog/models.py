@@ -28,11 +28,11 @@ class VolumeUnitConversion(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.TextField(max_length=255, null=False, default="Ингредиент", unique=True, verbose_name="Название",
+    name = models.CharField(max_length=255, null=False, default="Ингредиент", unique=True, verbose_name="Название",
                             validators=[
                                 RegexValidator(
                                     regex=r'^[A-Za-zА-Яа-яёЁ\s]+$',
-                                    message='Name should be a string value.'
+                                    message='Название должно быть строкой'
                                 )
                             ]
                             )
@@ -41,7 +41,7 @@ class Ingredient(models.Model):
         default=0,
         help_text="Калорийность на 100 ед. изм.",
         verbose_name="Калорийность",
-        validators=[MinValueValidator(1, 'Conversion rate must be positive.')]
+        validators=[MinValueValidator(0, 'Калорийность должна быть больше 0')]
     )
 
     def __str__(self):

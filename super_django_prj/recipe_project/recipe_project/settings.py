@@ -121,6 +121,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 OBJS_ON_PAGE = 6
 
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = 'auth/login/'
+LOGIN_URL = 'recipe_catalog:login'
 LOGOUT_REDIRECT_URL = '/'
 

@@ -99,7 +99,7 @@ def ingredient_delete(request, pk):
     context = {'form': form}
     if request.method == 'POST':
         instance.delete()
-        return redirect('recipe_catalog:ingredients')
+        return redirect('recipe_catalog:ingredients_list')
     return render(request, template, context)
 
 
