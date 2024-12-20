@@ -17,7 +17,7 @@ class IngredientForm(forms.ModelForm):
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ('name', 'description', 'image', 'cooking_time')  # Убираем поле ingredients
+        fields = ('name', 'description', 'image', 'cooking_time')
         labels = {
             'name': 'Название блюда',
             'description': 'Описание',
