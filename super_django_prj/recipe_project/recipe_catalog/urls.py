@@ -5,7 +5,7 @@ from django.views.generic import CreateView
 
 from .models import User
 from .views import about, index, detail, ingredient, ingredient_edit, ingredient_delete, recipe_create, \
-    recipe_edit, recipe_delete, my_recipes
+    recipe_edit, recipe_delete, my_recipes, ingredients_list
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -25,6 +25,7 @@ urlpatterns = [
                   path('recipe/<int:pk>/delete/', recipe_delete, name='recipe_delete'),
 
                   path('my_recipes/', my_recipes, name='my_recipes'),
+                  path('ingredients_list/', ingredients_list, name='ingredients_list'),
 
                   path('auth/login/', views.LoginView.as_view(template_name='login.html'), name='login'),
                   path('auth/register/', CreateView.as_view(

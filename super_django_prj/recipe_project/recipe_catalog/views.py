@@ -178,3 +178,13 @@ def my_recipes(request):
     }
 
     return render(request, template_name, context)
+
+
+@login_required
+def ingredients_list(request):
+    template_name = 'recipe_catalog/ingredients_list.html'
+    ingredients = Ingredient.objects.order_by('name')
+    context = {
+        'ingredients': ingredients
+    }
+    return render(request, template_name, context)

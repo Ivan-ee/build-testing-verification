@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4 text-dark-pink">Список ингредиентов</h1>
+
+{% if ingredients %}
+<ul class="list-group">
+    {% for ingredient in ingredients %}
+    <li class="list-group-item d-flex justify-content-between align-items-center bg-light-pink rounded-4 mb-2">
+        <span class="text-dark-pink fw-bold">{{ ingredient.name }}</span>
+        <div class="d-flex justify-content-around">
+            <a href="{% url 'recipe_catalog:ingredient_edit' ingredient.id %}" class="btn btn-primary rounded-4">Редактировать</a>
+            <a href="{% url 'recipe_catalog:ingredient_delete' ingredient.id %}" class="btn btn-danger rounded-4">Удалить</a>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<div class="alert alert-warning text-center rounded-4">
+    <p class="mb-0">Ингредиентов пока нет.</p>
+</div>
+{% endif %}
+{% endblock %}
