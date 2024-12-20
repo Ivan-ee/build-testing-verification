@@ -62,30 +62,11 @@ def detail(request, pk):
     return render(request, template_name, context)
 
 
-class UserForm(forms.Form):
-    first_name = forms.CharField(label='Имя', max_length=20)
-    last_name = forms.CharField(label='Фамилия', required=False)
-    user_email = forms.EmailField(label='Email', required=False)
-
-
-def user_form_test(request):
-    template = 'recipe_catalog/user_form_test.html'
-    if request.method == 'GET':
-        form = UserForm(request.GET)
-        if form.is_valid():
-            pass
-
-    else:
-        form = UserForm()
-
-    context = {'form': form}
-    return render(request, template, context)
-
-
 def ingredients(request):
     template_name = 'recipe_catalog/ingredients.html'
 
 
+@login_required
 def ingredient(request):
     template = 'recipe_catalog/ingredient_form.html'
     form = IngredientForm(request.POST or None)
@@ -96,6 +77,7 @@ def ingredient(request):
     return render(request, template, context)
 
 
+@login_required
 def ingredient_edit(request, pk):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -109,6 +91,7 @@ def ingredient_edit(request, pk):
     return render(request, template, context)
 
 
+@login_required
 def ingredient_delete(request, pk):
     template = 'recipe_catalog/ingredient_form.html'
     instance = get_object_or_404(Ingredient, pk=pk)
@@ -121,11 +104,6 @@ def ingredient_delete(request, pk):
 
 
 @login_required
-def simple_view(request):
-    return HttpResponse('Привет залогиненный пользователь!')
-
-
-@login_required
 def recipe_create(request):
     if request.method == "POST":
         form = RecipeForm(request.POST, request.FILES)
@@ -133,12 +111,11 @@ def recipe_create(request):
 
         if form.is_valid() and formset.is_valid():
             recipe = form.save(commit=False)
-            recipe.author = request.user  # Укажите текущего пользователя как автора
+            recipe.author = request.user
             recipe.save()
             formset.instance = recipe
             formset.save()
-            # Возвращаем redirect на список рецептов
-            return redirect('recipe_catalog:home')  # Замените 'recipe_list' на имя вашего маршрута
+            return redirect(reverse('recipe_catalog:my_recipes'))
     else:
         form = RecipeForm()
         formset = RecipeIngredientFormSet(instance=Recipe())
@@ -148,8 +125,12 @@ def recipe_create(request):
     })
 
 
+@login_required
 def recipe_edit(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
+
+    if recipe.author != request.user:
+        return redirect('recipe_catalog:home')
 
     if request.method == "POST":
         form = RecipeForm(request.POST, request.FILES, instance=recipe)
@@ -158,11 +139,11 @@ def recipe_edit(request, pk):
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
-            return redirect('recipe_catalog:home', pk=pk)
+            return redirect(reverse('recipe_catalog:my_recipes'))
 
     else:
         form = RecipeForm(instance=recipe)
-        formset = RecipeIngredientFormSet(instance=recipe)  # Создаем formset и для GET
+        formset = RecipeIngredientFormSet(instance=recipe)
 
     return render(request, 'recipe_catalog/recipe_form.html', {
         'form': form,
@@ -170,9 +151,30 @@ def recipe_edit(request, pk):
     })
 
 
+@login_required
 def recipe_delete(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
+
+    if recipe.author != request.user:
+        return redirect('recipe_catalog:home')
+
     if request.method == "POST":
         recipe.delete()
-        return redirect(reverse('recipe_catalog:home'))
+        return redirect(reverse('recipe_catalog:my_recipes'))
     return render(request, 'recipe_catalog/recipe_confirm_delete.html', {'recipe': recipe})
+
+
+@login_required
+def my_recipes(request):
+    template_name = 'recipe_catalog/index.html'
+    recipes_list = Recipe.objects.filter(author=request.user).order_by('name')
+    paginator = Paginator(recipes_list, settings.OBJS_ON_PAGE)
+
+    page_number = request.GET.get('page')
+    recipes = paginator.get_page(page_number)
+
+    context = {
+        'recipes': recipes
+    }
+
+    return render(request, template_name, context)

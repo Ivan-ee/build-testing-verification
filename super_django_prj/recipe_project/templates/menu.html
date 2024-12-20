@@ -2,10 +2,15 @@
     <nav class="container d-flex justify-content-center">
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link text-dark-pink fw-bold" href="/">Главная страница</a>
+                <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:home' %}">Главная страница</a>
             </li>
+            {% if request.user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link text-dark-pink fw-bold" href="/about/">О сайте</a>
+                <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:my_recipes' %}">Мои рецепты</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link text-dark-pink fw-bold" href="{% url 'recipe_catalog:about' %}">О сайте</a>
             </li>
         </ul>
     </nav>

@@ -4,8 +4,8 @@ from django.urls import path, reverse_lazy
 from django.views.generic import CreateView
 
 from .models import User
-from .views import about, index, detail, user_form_test, ingredient, ingredient_edit, ingredient_delete, recipe_create, \
-    recipe_edit, recipe_delete
+from .views import about, index, detail, ingredient, ingredient_edit, ingredient_delete, recipe_create, \
+    recipe_edit, recipe_delete, my_recipes
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -16,7 +16,6 @@ urlpatterns = [
                   path('', index, name='home'),
                   path('recipe/<int:pk>/', detail, name='detail'),
                   path('about/', about, name='about'),
-                  path('user_form_test/', user_form_test, name='create_user_test'),
                   path('ingredient/', ingredient, name='ingredient'),
                   path('ingredient/<int:pk>/edit/', ingredient_edit, name='ingredient_edit'),
                   path('ingredient/<int:pk>/delete/', ingredient_delete, name='ingredient_delete'),
@@ -24,6 +23,8 @@ urlpatterns = [
                   path('recipe/', recipe_create, name='recipe_create'),
                   path('recipe/<int:pk>/edit/', recipe_edit, name='recipe_edit'),
                   path('recipe/<int:pk>/delete/', recipe_delete, name='recipe_delete'),
+
+                  path('my_recipes/', my_recipes, name='my_recipes'),
 
                   path('auth/login/', views.LoginView.as_view(template_name='login.html'), name='login'),
                   path('auth/register/', CreateView.as_view(

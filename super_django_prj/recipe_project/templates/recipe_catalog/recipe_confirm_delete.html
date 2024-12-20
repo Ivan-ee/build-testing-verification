@@ -9,7 +9,7 @@
     <p>{{ data.name }}</p>
 
     <button type="submit" class="btn btn-danger">Удалить</button>
-    <a href="{% url 'recipe_catalog:detail' pk=recipe.id %}" class="btn btn-secondary">Отмена</a>
+    <a href="{% url 'recipe_catalog:my_recipes' %}" class="btn btn-secondary">Отмена</a>
 
 </form>
 {% endwith %}
