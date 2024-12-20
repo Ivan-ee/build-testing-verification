@@ -85,7 +85,7 @@ class TestClientAuth(TestCase):
         """Авторизованный пользователь может создать рецепт."""
         recipes_before = Recipe.objects.count()
         response = self.client_1.post(reverse('recipe_catalog:recipe_create'), data=self.form_data_recipe)
-        self.assertEqual(response.status_code, 302, "Должен быть редирект после создания рецепта")
+        self.assertEqual(response.status_code, HTTPStatus.FOUND, "Должен быть редирект после создания рецепта")
         recipes_after = Recipe.objects.count()
         self.assertEqual(recipes_before + 1, recipes_after, "Рецепт должен быть создан")
         new_recipe = Recipe.objects.latest('pk')
@@ -132,7 +132,7 @@ class TestClientAuth(TestCase):
         )
         url_edit = reverse('recipe_catalog:recipe_edit', args=[recipe_user_1.pk])
         response_edit = self.client_1.post(url_edit, data={"name": "New Name"})
-        self.assertEqual(response_edit.status_code, 200, "Автор может отредактировать свой рецепт")
+        self.assertEqual(response_edit.status_code, HTTPStatus.OK, "Автор может отредактировать свой рецепт")
 
     def test_author_can_edit_ingredient(self):
         """Автор может редактировать свой ингредиент"""
@@ -174,11 +174,12 @@ class TestClientAuth(TestCase):
         )
         url_edit = reverse('recipe_catalog:recipe_edit', args=[recipe_user_1.pk])
         response_edit = self.client_2.get(url_edit)
-        self.assertEqual(response_edit.status_code, 302,
+        self.assertEqual(response_edit.status_code, HTTPStatus.FOUND,
                          "Другой пользователь не должен получить доступ к странице редактирования")
         response_edit_post = self.client_2.post(url_edit, data={"name": "New Name", "description": "new description",
                                                                 "cooking_time": 10})
-        self.assertEqual(response_edit_post.status_code, 302, "Другой пользователь не должен редактировать рецепт")
+        self.assertEqual(response_edit_post.status_code, HTTPStatus.FOUND,
+                         "Другой пользователь не должен редактировать рецепт")
         recipe_user_1.refresh_from_db()
         with self.subTest(msg="Проверка редактирования рецепта"):
             self.assertNotEqual(recipe_user_1.name, "New Name", "Имя рецепта не должно обновиться")
@@ -194,7 +195,8 @@ class TestClientAuth(TestCase):
         url_delete = reverse('recipe_catalog:recipe_delete', args=[recipe_user_1.pk])
         count_before = Recipe.objects.count()
         response_delete = self.client_2.post(url_delete)
-        self.assertEqual(response_delete.status_code, 302, "Другой пользователь не должен удалить свой рецепт")
+        self.assertEqual(response_delete.status_code, HTTPStatus.FOUND,
+                         "Другой пользователь не должен удалить свой рецепт")
         count_after = Recipe.objects.count()
         with self.subTest(msg="Проверка удаления рецепта"):
             self.assertEqual(count_before, count_after, "Рецепт не должен быть удален")

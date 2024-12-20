@@ -75,7 +75,7 @@ class TestClientAnonymous(TestCase):
         """Анонимный пользователь не может создать рецепт"""
         response = self.client.get(self.RECIPE_CREATE_URL)
         self.assertRedirects(response, f'/auth/login/?next={self.RECIPE_CREATE_URL}')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
         self.client.post(self.url_recipe_create, data=self.data_recipe)
         recipes_count = Recipe.objects.count()
@@ -95,39 +95,39 @@ class TestClientAnonymous(TestCase):
         """Анонимный пользователь не может просмотреть список ингредиентов"""
         response = self.client.get(self.INGREDIENTS_LIST_URL)
         self.assertRedirects(response, f'/auth/login/?next={self.INGREDIENTS_LIST_URL}')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_anonymous_user_cant_access_my_recipes(self):
         """Анонимный пользователь не может просмотреть свои рецепты"""
         response = self.client.get(self.MY_RECIPES_URL)
         self.assertRedirects(response, f'/auth/login/?next={self.MY_RECIPES_URL}')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_anonymous_user_cant_edit_recipe(self):
         """Анонимный пользователь не может редактировать рецепт"""
         url = reverse(self.RECIPE_EDIT_URL, args=[self.recipe.pk])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_anonymous_user_cant_delete_recipe(self):
         """Анонимный пользователь не может удалить рецепт"""
         url = reverse(self.RECIPE_DELETE_URL, args=[self.recipe.pk])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_anonymous_user_cant_edit_ingredient(self):
         """Анонимный пользователь не может редактировать ингредиент"""
         url = reverse(self.INGREDIENT_EDIT_URL, args=[1])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_anonymous_user_cant_delete_ingredient(self):
         """Анонимный пользователь не может удалить ингредиент"""
         url = reverse(self.INGREDIENT_DELETE_URL, args=[1])
         response = self.client.get(url)
         self.assertRedirects(response, f'/auth/login/?next={url}')
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
